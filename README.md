@@ -11,3 +11,5 @@ Maybe I have invested more time in JS than in java... <br />
 
 The game is not finished yet. There are 4 different PokeJavas. There is a big map with a gym and 5 smaller maps. <br />
 But the game is playable, the main functions are working. <br />
+
+Earlier, I asked StackOverFlow for solutions, now I am asking ChatGPT. <br />
