@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "RestServiceApplication",
+            "request": "launch",
+            "mainClass": "com.pokejava.RestServiceApplication",
+            "projectName": "rest-service-complete"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-RestServiceApplication<rest-service-complete>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.restservice.RestServiceApplication",
+            "projectName": "rest-service-complete",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
