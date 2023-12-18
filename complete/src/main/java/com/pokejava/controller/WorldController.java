@@ -73,6 +73,7 @@ public class WorldController {
   public InteractionInfo getInteraction(@RequestBody java.util.Map<String, String> requestBody) { 
     String userAnswer = requestBody.get("userAnswer");
     InteractionInfo i1 = m1.npcInteraction(userAnswer, t1.getPokes()); 
+    if (i1 == null) { return null;}
     if (i1.battle()) { b1 = new Battle(t1, i1.npc()); }
     return i1;
   }
