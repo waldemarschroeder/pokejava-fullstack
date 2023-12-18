@@ -7,6 +7,7 @@ public class NPC {
 
     private Position p;
     public Position getPos() { return this.p;}
+    public void setPos(Position p) { this.p = p;}
 
     // max 6 pokejavas
     private PokeJava[] pokes = new PokeJava[6];

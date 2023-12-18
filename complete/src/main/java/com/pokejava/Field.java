@@ -11,7 +11,7 @@ public class Field {
     public boolean getIsTherePoke() { return this.isTherePoke; }
     private boolean isAccessable = true;
     public boolean getIsAccessable () { return this.isAccessable; }
-    //public void setIsAccessable(boolean isAccessable) { this.isAccessable = isAccessable; }
+    public void setIsAccessable(boolean isAccessable) { this.isAccessable = isAccessable; }
     
     public Field (String type){
         this.type = type;

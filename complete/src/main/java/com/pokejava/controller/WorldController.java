@@ -48,9 +48,9 @@ public class WorldController {
   // curl localhost:8080/rest/move?direction=right
   public MapInfo move(@RequestBody java.util.Map<String, String> requestBody) {
     String direction = requestBody.get("direction");
-    m1.mvTrainerInMap(direction);
+    m1.moveTrainer(direction);
     Map m2 = MapInterfaceDB.nextMap(m1.getName(), m1.getPosition());
-    if ( m2 != null) { m1 = m2; m1.mvTrainerInMap(direction); }
+    if ( m2 != null) { m1 = m2; m1.moveTrainer(direction); }
 		return m1.getMapInfo();
 	}
 

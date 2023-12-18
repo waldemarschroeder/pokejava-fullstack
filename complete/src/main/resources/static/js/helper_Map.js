@@ -49,7 +49,7 @@ function appendMap(matrix) {
     for (let j = 0; j < matrix[i].length; j++) {
       const cell = document.createElement('td');
       const img = document.createElement('img');
-      img.id = "img" + i + j;
+      img.id = "img" + i + "-" + j;
 
       // Set the image source based on matrix value
       if (fieldToImage(matrix[i][j]) == null) { cell.style.visibility = "hidden"; }
@@ -69,7 +69,7 @@ function appendMap(matrix) {
   
 }
 
-function fieldToImage(field) {
+function fieldToImage(field, isThereNpc) {
   
   // Your image URLs
   const imageUrls = [
@@ -97,23 +97,31 @@ function fieldToImage(field) {
   var imageUrl;
   // Set the image source based on matrix value
   switch (field) {
-    case 'G': imageUrl = imageUrls[0]; break;
-    case 'S': imageUrl = imageUrls[1]; break;
+    case 'G': 
+      if(isThereNpc) { imageUrl = imageUrls[14]; }
+      else { imageUrl = imageUrls[0]; }
+      break;
+    case 'S': 
+      if(isThereNpc) { imageUrl = imageUrls[15]; }
+      else { imageUrl = imageUrls[1]; }
+      break;
     case 'W': imageUrl = imageUrls[2]; break;
     case 'B': imageUrl = imageUrls[3]; break;
     case 'E': imageUrl = imageUrls[4]; break;
-    case 'SNOW': imageUrl = imageUrls[5]; break;
+    case 'SNOW': 
+      if(isThereNpc) { imageUrl = imageUrls[16]; }
+      else { imageUrl = imageUrls[5]; }
+      break;
     case 'houseLLH': imageUrl = imageUrls[6]; break;
     case 'houseMLH': imageUrl = imageUrls[7]; break;
     case 'houseRLH': imageUrl = imageUrls[8]; break;
     case 'houseLUH': imageUrl = imageUrls[9]; break;
     case 'houseMUH': imageUrl = imageUrls[10]; break;
     case 'houseRUH': imageUrl = imageUrls[11]; break;
-    case 'floor': imageUrl = imageUrls[12]; break;
-    case 'floorNPC': imageUrl = imageUrls[13]; break;
-    case 'GNPC': imageUrl = imageUrls[14]; break;
-    case 'SNPC': imageUrl = imageUrls[15]; break;
-    case 'SNOWNPC': imageUrl = imageUrls[16]; break;
+    case 'floor': 
+      if(isThereNpc) { imageUrl = imageUrls[13]; }
+      else { imageUrl = imageUrls[12]; } 
+      break;
     // Add more cases as needed
     default:
       // Handle unexpected values or leave the cell empty
@@ -127,7 +135,7 @@ function fieldToImage(field) {
 function updateTrainerInMap(matrix, trainerPos, trainerDirection) {
 
   // update new Field where trainer is
-  var trainerCellId = "img" + trainerPos.y + trainerPos.x;
+  var trainerCellId = "img" + trainerPos.y + "-" + trainerPos.x;
   var trainerCell = document.getElementById(trainerCellId); 
   var field = matrix[trainerPos.y][trainerPos.x];
   var imgSrc;
@@ -142,17 +150,30 @@ function updateTrainerInMap(matrix, trainerPos, trainerDirection) {
   // update the old field where trainer was
   // Convert JSON objects to strings
   if (!(JSON.stringify(currentTrainerPos) === JSON.stringify(trainerPos))) {
-    trainerCellId = "img" + currentTrainerPos.y + currentTrainerPos.x;
+    trainerCellId = "img" + currentTrainerPos.y + "-" + currentTrainerPos.x;
     trainerCell = document.getElementById(trainerCellId); 
     field = matrix[currentTrainerPos.y][currentTrainerPos.x];
-    trainerCell.src = fieldToImage(field);
+    trainerCell.src = fieldToImage(field, false);
+  }
+
+}
+
+function updateNpcsInMap(matrix, npcsPos, placeORdelete) {
+  
+  for(i = 0; i < npcsPos.length; i++) {
+    npcPos = npcsPos[i];
+    npcCellId = "img" + npcPos.y + "-" + npcPos.x;
+    npcCell = document.getElementById(npcCellId); 
+    field = matrix[npcPos.y][npcPos.x];
+    npcCell.src = fieldToImage(field, placeORdelete);
+
   }
 
 }
 
 function scrollToTarget(trainerPos) {
 
-  const element = document.getElementById('img00');
+  const element = document.getElementById('img0-0');
   const cellHeight = parseInt(window.getComputedStyle(element).height, 10);
   const cellWidth = parseInt(window.getComputedStyle(element).width, 10);
 

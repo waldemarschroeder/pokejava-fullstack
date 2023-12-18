@@ -23,6 +23,7 @@ async function postAsync (context, postData) {
 }
 
 var currentTrainerPos;
+var currentNpcsPos;
 var currentMapName;
 // init map
 function initMap() {
@@ -33,6 +34,8 @@ function initMap() {
       appendMap(data.matrixString); 
       currentTrainerPos = data.trainerPos;
       updateTrainerInMap(data.matrixString, data.trainerPos, data.trainerDirection); 
+      currentNpcsPos = data.npcsPos;
+      updateNpcsInMap(data.matrixString, data.npcsPos, true)
       scrollToTarget(data.trainerPos);  
     })
       .catch(()=>{
@@ -60,6 +63,11 @@ function apiMoving(direction) {
       updateTrainerInMap(data.matrixString, data.trainerPos, data.trainerDirection); 
       currentTrainerPos = data.trainerPos;
       scrollToTarget(data.trainerPos); 
+
+      if (currentNpcsPos != data.npcsPos) {
+        updateNpcsInMap(data.matrixString, data.npcsPos, true);
+        currentNpcsPos = data.npcsPos;
+      }
       //console.log(data.battle); 
     })
       .catch(()=>{
