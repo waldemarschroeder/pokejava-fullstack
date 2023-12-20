@@ -41,6 +41,7 @@ public class WorldController {
   
   @GetMapping("/get-map")
   public MapInfo initMap() {
+    m1.npcsAutoAction();
 		return m1.getMapInfo();
 	}
 
@@ -88,23 +89,30 @@ public class WorldController {
 
   @GetMapping("/get-battleinfo")
   public BattleInfo getBattle() { 
-    if (b1 == null) { return new BattleInfo(null, null, null, false, false); }
+    // if (b1 == null) { return new BattleInfo(null, null, null, false, false); }
     return b1.getBattleInfo(); 
   }
   
   @PostMapping("/update-battle")
   public BattleInfo updateBattle(@RequestBody java.util.Map<String, Integer> requestBody) { 
-    if (b1 == null) { return new BattleInfo(null, null, null, false, false); }
+    // if (b1 == null) { return new BattleInfo(null, null, null, false, false); }
     int userChoice = requestBody.get("userChoice");
-    if (b1.getBattleInfo().active()) { b1.fight(userChoice); }
+    b1.fight(userChoice);
+    if (!b1.getBattleInfo().active()) {
+      m1.setBattle(false);
+      m1.setTrainerMayMove(true);
+    }
     return b1.getBattleInfo(); 
   }
 
   @GetMapping("/try-escape")
   public boolean tryEscape() { 
-    if (b1 == null) { return true; }
+    // if (b1 == null) { return true; }
     boolean tmp = b1.tryEscape();
-    if (tmp) {b1 = null;};
+    if (tmp) {
+      m1.setBattle(false);
+      m1.setTrainerMayMove(true);
+    }
     return tmp;
   }
   

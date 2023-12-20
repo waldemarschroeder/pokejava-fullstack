@@ -10,8 +10,8 @@ function rmElementById(id) {
 // helper function
 function appendMapName(name) {
     
-  // only one mapName on the site
-  if (document.getElementById("mapName")) { return; }
+  // update mapName always
+  rmElementById("mapName");
 
   // Create an h2 element
   const h2Element = document.createElement('h2');
@@ -171,6 +171,19 @@ function updateNpcsInMap(matrix, npcsPos, placeORdelete) {
 
 }
 
+function moveNpcsInMap(matrixString, npcsPos) {
+  if (currentNpcsPos != npcsPos) {
+    // old npc places delete
+    updateNpcsInMap(matrixString, currentNpcsPos, false);
+    
+    // new npc places 
+    updateNpcsInMap(matrixString, npcsPos, true);
+    
+    // update currentNpcs
+    currentNpcsPos = npcsPos;
+  }
+}
+
 function scrollToTarget(trainerPos) {
 
   const element = document.getElementById('img0-0');
@@ -187,5 +200,18 @@ function scrollToTarget(trainerPos) {
     map.scrollLeft = targetX - mapContainer.clientWidth / 2 + cellWidth / 2;
   }
 
+}
+
+// render whole map, Caution: is expensive
+function renderMap(data) {
+  content.replaceChildren();
+  appendMapName(data.name); 
+  currentMapName = data.name;
+  appendMap(data.matrixString); 
+  currentTrainerPos = data.trainerPos;
+  updateTrainerInMap(data.matrixString, data.trainerPos, data.trainerDirection); 
+  currentNpcsPos = data.npcsPos;
+  updateNpcsInMap(data.matrixString, data.npcsPos, true);
+  scrollToTarget(data.trainerPos);  
 }
 

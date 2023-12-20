@@ -5,7 +5,7 @@ public class NPC {
     private String name;
     public String getName() { return this.name; }
 
-    private Position p;
+    protected Position p;
     public Position getPos() { return this.p;}
     public void setPos(Position p) { this.p = p;}
 
@@ -24,6 +24,18 @@ public class NPC {
     
     // Override
     public InteractionInfo interacted(String userAnswer, PokeJava[] pokes) { return new InteractionInfo("hi", null, false, this); }
+
+    //Override
+    public void autoAction(Map map) {}
+
+    public boolean move(Map map, String direction) {
+        Position target = map.getTargetPosition(this.p, direction);
+        if (map.mayMove(target)) {
+            map.moveObj(this.p, target);
+            this.p = target;
+            return true;
+        } else { return false; }
+    }
 
     public NPC(Position p) { this.p = p; }
 

@@ -25,18 +25,12 @@ async function postAsync (context, postData) {
 var currentTrainerPos;
 var currentNpcsPos;
 var currentMapName;
+
 // init map
 function initMap() {
   fetchAsync("/get-map")
     .then(data => { 
-      appendMapName(data.name); 
-      currentMapName = data.name;
-      appendMap(data.matrixString); 
-      currentTrainerPos = data.trainerPos;
-      updateTrainerInMap(data.matrixString, data.trainerPos, data.trainerDirection); 
-      currentNpcsPos = data.npcsPos;
-      updateNpcsInMap(data.matrixString, data.npcsPos, true)
-      scrollToTarget(data.trainerPos);  
+      renderMap(data);
     })
       .catch(()=>{
         ///Exception occured do something
@@ -44,30 +38,34 @@ function initMap() {
 }
 initMap();
 
+// update map
+function updateMap() {
+  fetchAsync("/get-map")
+    .then(data => { 
+      moveNpcsInMap(data.matrixString, data.npcsPos);
+    })
+      .catch(()=>{
+        ///Exception occured do something
+      });
+}
+
 // apiMoving
 function apiMoving(direction) {
   // {direction} -> {"direction":"up"}
   postAsync("/move", {direction})
     .then(data => { 
+      if (!data.trainerMayMove) { return; }
       rmElementById("npcInteraction");
       // render map only when map has changed, map rendering is expensive
       if (!(JSON.stringify(currentMapName) === JSON.stringify(data.name))) {
-        rmElementById("mapName");
-        appendMapName(data.name); 
-        content.replaceChildren();
-        appendMap(data.matrixString);
-        currentMapName = data.name;
-        currentTrainerPos = data.trainerPos;
+        renderMap(data);
       }
       // update trainer position in map always
       updateTrainerInMap(data.matrixString, data.trainerPos, data.trainerDirection); 
       currentTrainerPos = data.trainerPos;
       scrollToTarget(data.trainerPos); 
 
-      if (currentNpcsPos != data.npcsPos) {
-        updateNpcsInMap(data.matrixString, data.npcsPos, true);
-        currentNpcsPos = data.npcsPos;
-      }
+      //moveNpcsInMap(data.matrixString, data.npcsPos);
       //console.log(data.battle); 
     })
       .catch(()=>{
@@ -131,3 +129,5 @@ function checkKey(e) {
 
 }
 
+// Update the map every 0,75 seconds
+setInterval(updateMap, 750);

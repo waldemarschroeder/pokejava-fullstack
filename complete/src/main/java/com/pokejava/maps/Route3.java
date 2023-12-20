@@ -1,6 +1,7 @@
 package com.pokejava.maps;
 
 import com.pokejava.*;
+import com.pokejava.npcs.Route3TopNpc;
 
 public class Route3 extends Map {
 
@@ -27,8 +28,8 @@ public class Route3 extends Map {
 
     @Override
     public NPC[] getInitNpcs() {
-        return new NPC[] { 
-            new NPC(new Position(3, 8)), 
+        return new NPC[] {  
+            new Route3TopNpc(new Position(3, 8)),
             new NPC(new Position(7, 6)),
             new NPC(new Position(12, 9)),
         };

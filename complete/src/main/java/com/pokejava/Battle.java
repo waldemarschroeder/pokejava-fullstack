@@ -88,7 +88,7 @@ public class Battle {
             // battle is over
             if (index == 100) { 
                 this.active = false;
-                texts3 = new String[] {"You lost" };
+                texts3 = new String[] { "You lost" };
             } else {
                 // next poke
                 this.indexFightingTrainerPoke = index;
@@ -99,7 +99,7 @@ public class Battle {
             // battle is over
             if (index == 100) { 
                 this.active = false; 
-                texts3 = new String[] {"You won" };
+                texts3 = new String[] { "You won" };
                 npc.setdefeated(true);
             } else {
                 // next poke

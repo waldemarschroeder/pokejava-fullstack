@@ -11,30 +11,21 @@ public class Map {
     public Position getPosition() { return this.trainerPos; }
 
     protected boolean trainerMayMove = true;
-    protected boolean npcMoving = false;
+    public void setTrainerMayMove(boolean trainerMayMove) { this.trainerMayMove = trainerMayMove; }
+
+    protected boolean battle = false;
+    public void setBattle(boolean battle) { this.battle = battle; }
     
     protected String trainerDirection = "up"; // "up" init value
-    
-    public Position getTargetPosition(Position p, String direction) { 
-        Position target;
-        switch(direction) {
-            case "left": target = new Position(p.y(), p.x()-1); break;
-            case "right": target = new Position(p.y(), p.x()+1); break;
-            case "up": target = new Position(p.y()-1, p.x()); break;
-            case "down": target = new Position(p.y()+1, p.x()); break;
-            default: target = p; break;
-        }
-        return target;
-    }
 
     private String[][] matrixString;
     public String[][] getInitMatrixString() { return null; } // Override
 
     private Field[][] matrixField;
 
-    public record MapInfo(String name, String[][] matrixString, Position trainerPos, String trainerDirection, boolean trainerMayMove, boolean npcMoving, Position[] npcsPos, boolean battle) {}
+    public record MapInfo(String name, String[][] matrixString, Position trainerPos, String trainerDirection, boolean trainerMayMove, Position[] npcsPos, boolean battle) {}
     public MapInfo getMapInfo() {
-        return new MapInfo(this.name, this.matrixString, this.trainerPos, this.trainerDirection, this.trainerMayMove, this.npcMoving, this.getNpcsPos(), wildPokeAttacked());
+        return new MapInfo(this.name, this.matrixString, this.trainerPos, this.trainerDirection, this.trainerMayMove, this.getNpcsPos(), this.battle);
     }
 
     private NPC[] npcs;
@@ -96,10 +87,14 @@ public class Map {
         
         if (this.npcs != null) {
             for(int i = 0; i < this.npcs.length; i++) {
-                this.matrixField[this.npcs[i].getPos().y()][this.npcs[i].getPos().x()].setIsAccessable(false);
+                fieldSetIsAccessable(this.npcs[i].getPos(), false);
             }
         }
 
+    }
+
+    public void fieldSetIsAccessable(Position p, boolean isAccessable) {
+        this.matrixField[p.y()][p.x()].setIsAccessable(isAccessable);
     }
 
     public void moveTrainer(String direction) {
@@ -109,30 +104,36 @@ public class Map {
         // update trainerDirection should be always possible
         this.trainerDirection = direction;
         
-        Position target = getTargetPosition(this.trainerPos, direction);
-
-        // Map must have a border of not accessable fields
-        if ( this.matrixField [target.y()][target.x()].getIsAccessable() ) {
-            
-            // update map.trainerPos
+        Position target = getTargetPosition(trainerPos, direction);
+        if (mayMove(target)) { 
+            moveObj(trainerPos, target);
             this.trainerPos = target;
-
-        } else { /*System.out.println("\nBLOCKED moving");*/ }
-        
+        }
+    }
+    
+    public void moveObj(Position pold, Position target) {
+        if (mayMove(target)) { 
+            // old field is accessable again, the new one not
+            fieldSetIsAccessable(pold, true);
+            fieldSetIsAccessable(target, false);
+        }
     }
 
-    public void moveObj(NPC npc, String direction) {
-        
-        Position target = getTargetPosition(npc.getPos(), direction);
+    public Position getTargetPosition(Position p, String direction) { 
+        Position target;
+        switch(direction) {
+            case "left": target = new Position(p.y(), p.x()-1); break;
+            case "right": target = new Position(p.y(), p.x()+1); break;
+            case "up": target = new Position(p.y()-1, p.x()); break;
+            case "down": target = new Position(p.y()+1, p.x()); break;
+            default: target = p; break;
+        }
+        return target;
+    }
 
+    public boolean mayMove(Position target) {
         // Map must have a border of not accessable fields
-        if ( this.matrixField [target.y()][target.x()].getIsAccessable() ) {
-            
-            // update position
-            npc.setPos(target);
-
-        } else { /*System.out.println("\nBLOCKED moving");*/ }
-        
+        return this.matrixField [target.y()][target.x()].getIsAccessable();
     }
 
     public InteractionInfo npcInteraction(String userAnswer, PokeJava[] pokes) {
@@ -141,7 +142,19 @@ public class Map {
         Position target = getTargetPosition(this.trainerPos, this.trainerDirection);
 
         for (NPC npc : npcs) {
-            if (target.equals(npc.getPos())) { return npc.interacted(userAnswer, pokes); }
+            if (target.equals(npc.getPos())) { 
+                InteractionInfo activeNpc = npc.interacted(userAnswer, pokes);
+                if (activeNpc.possibleUserAnswers() != null) { this.trainerMayMove = false; }
+                else if (activeNpc.battle()) { 
+                    this.trainerMayMove = false; 
+                    this.battle = true;
+                }
+                else {
+                    this.trainerMayMove = true; 
+                    this.battle = false;
+                }
+                return activeNpc; 
+            }
         }
         return null;
         
@@ -149,6 +162,11 @@ public class Map {
 
     private boolean wildPokeAttacked() {
         return this.matrixField[this.trainerPos.y()][this.trainerPos.x()].getIsTherePoke();
+    }
+
+    public void npcsAutoAction() {
+        // activate autoAction from every npc 
+        for (NPC npc : npcs) { npc.autoAction(this); }
     }
 
     
