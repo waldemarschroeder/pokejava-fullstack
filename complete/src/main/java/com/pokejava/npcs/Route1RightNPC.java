@@ -7,18 +7,18 @@ public class Route1RightNPC extends NPC {
 
     // Override
     @Override
-    public InteractionInfo interacted(String userAnswer, PokeJava[] pokes) { 
+    public InteractionInfo interacted(String userAnswer, NPC trainer) { 
+        Battle battle = null;
         String npcAnswer = "";
-        boolean battle = false;
         String[] possibleUserAnswers = null;
         
         if (!defeated) {
             switch(userAnswer) {
                 // second answer
-                case "yes": npcAnswer = "Yeah, let's go!"; battle = true; break;
+                case "yes": npcAnswer = "Yeah, let's go!"; battle = new Battle(trainer, this); break;
 
                 // second answer
-                case "no": npcAnswer = "I don't care, we will fight nevertheless!"; battle = true; break;
+                case "no": npcAnswer = "I don't care, we will fight nevertheless!"; battle = new Battle(trainer, this); break;
                 
                 // first answer
                 default: 
@@ -29,10 +29,10 @@ public class Route1RightNPC extends NPC {
         } else {
             switch(userAnswer) {
                 // second answer
-                case "yes": npcAnswer = "I will win this time!"; battle = true; healPokes(); break;
+                case "yes": npcAnswer = "I will win this time!"; battle = new Battle(trainer, this); healPokes(); break;
 
                 // second answer
-                case "no": npcAnswer = "Yeah, you know, that you will lose!"; battle = false; break;
+                case "no": npcAnswer = "Yeah, you know, that you will lose!"; battle = null; break;
                 
                 // first answer
                 default: 
@@ -42,7 +42,7 @@ public class Route1RightNPC extends NPC {
             }
         }
 
-        return new InteractionInfo(npcAnswer, possibleUserAnswers, battle, this);
+        return new InteractionInfo(npcAnswer, possibleUserAnswers, battle);
 
     }
 

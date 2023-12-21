@@ -6,7 +6,7 @@ public class PokeCenterLady extends NPC {
 
     // Override
     @Override
-    public InteractionInfo interacted(String userAnswer, PokeJava[] pokes) { 
+    public InteractionInfo interacted(String userAnswer, NPC trainer) { 
         String npcAnswer = "";
         String[] possibleUserAnswers = null;
         
@@ -14,9 +14,7 @@ public class PokeCenterLady extends NPC {
             // second answer
             case "yes": 
                 npcAnswer = "Ok, your PokeJavas are now healed."; 
-                for(PokeJava poke : pokes) {
-                    poke.recHp(); 
-                }
+                trainer.healPokes();
                 break;
 
             // second answer
@@ -29,7 +27,7 @@ public class PokeCenterLady extends NPC {
                 break;
         }
 
-        return new InteractionInfo(npcAnswer, possibleUserAnswers, false, this);
+        return new InteractionInfo(npcAnswer, possibleUserAnswers, null);
 
     }
 

@@ -6,15 +6,15 @@ public class Route3TopNpc extends NPC {
 
     // Override
     @Override
-    public InteractionInfo interacted(String userAnswer, PokeJava[] pokes) { return new InteractionInfo("I am John.",
-     null, false, this); }
+    public InteractionInfo interacted(String userAnswer, NPC trainer) { return new InteractionInfo("I am John.",
+     null, null); }
 
     public Route3TopNpc(Position p) { super(p); }
 
     private int counter = 0;
     // Override
     @Override
-    public void autoAction(Map map) {
+    public InteractionInfo autoAction(Map map) {
 
         int maxCount = 16;
 
@@ -31,6 +31,8 @@ public class Route3TopNpc extends NPC {
         if (counter == maxCount) {
             this.counter = 0;
         }
+
+        return null;
 
     }
 

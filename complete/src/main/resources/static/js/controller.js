@@ -40,13 +40,34 @@ initMap();
 
 // update map
 function updateMap() {
-  fetchAsync("/get-map")
+
+  fetchAsync("/update-npcs")
     .then(data => { 
-      moveNpcsInMap(data.matrixString, data.npcsPos);
+      if (data === null) { return; }
+      appendNpcInteraction();
+      appendDialogBox(data.npcAnswer);
+      if (data.possibleUserAnswers !== null) { appendAnswerBtns(data.possibleUserAnswers); }
+      if (data.battle) { 
+        // wait 2 s
+        setTimeout(function() { initBattle(); }, 2000); 
+      }
     })
       .catch(()=>{
         ///Exception occured do something
       });
+  
+  fetchAsync("/get-map")
+    .then(data => { 
+      moveNpcsInMap(data.matrixString, data.npcsPos);
+      // update trainer position in map always
+      updateTrainerInMap(data.matrixString, data.trainerPos, data.trainerDirection); 
+      currentTrainerPos = data.trainerPos;
+      scrollToTarget(data.trainerPos); 
+    })
+      .catch(()=>{
+        ///Exception occured do something
+      });
+  
 }
 
 // apiMoving

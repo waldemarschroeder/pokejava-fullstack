@@ -28,6 +28,6 @@ public class COAh3 extends Map {
         };
     }
 
-    public COAh3(Position trainerPos) { super(trainerPos, "House 3 in Azure"); }
+    public COAh3(NPC trainer) { super(trainer, "House 3 in Azure"); }
     
 }

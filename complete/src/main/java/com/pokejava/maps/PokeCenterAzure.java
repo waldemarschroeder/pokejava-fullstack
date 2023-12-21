@@ -29,6 +29,6 @@ public class PokeCenterAzure extends Map {
         };
     }
 
-    public PokeCenterAzure(Position trainerPos) { super(trainerPos, "PokeCenter Azure"); }
+    public PokeCenterAzure(NPC trainer) { super(trainer, "PokeCenter Azure"); }
     
 }

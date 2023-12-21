@@ -30,6 +30,6 @@ public class GymOfFire extends Map {
         };
     }
 
-    public GymOfFire(Position trainerPos) { super(trainerPos, "Gym of Fire"); }
+    public GymOfFire(NPC trainer) { super(trainer, "Gym of Fire"); }
     
 }

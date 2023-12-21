@@ -40,6 +40,6 @@ public class CityOfAzure extends Map {
         };
     }
 
-    public CityOfAzure(Position trainerPos) { super(trainerPos, "City of Azure"); }
+    public CityOfAzure(NPC trainer) { super(trainer, "City of Azure"); }
     
 }

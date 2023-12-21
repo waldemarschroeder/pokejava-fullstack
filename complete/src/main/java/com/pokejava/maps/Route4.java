@@ -1,6 +1,7 @@
 package com.pokejava.maps;
 
 import com.pokejava.*;
+import com.pokejava.npcs.Route4RightNPC;
 
 public class Route4 extends Map {
 
@@ -28,10 +29,10 @@ public class Route4 extends Map {
     public NPC[] getInitNpcs() {
         return new NPC[] { 
             new NPC(new Position(1, 4)), 
-            new NPC(new Position(1, 8)),
+            new Route4RightNPC(new Position(1, 8)),
         };
     }
 
-    public Route4(Position trainerPos) { super(trainerPos, "Route 4"); }
+    public Route4(NPC trainer) { super(trainer, "Route 4"); }
     
 }

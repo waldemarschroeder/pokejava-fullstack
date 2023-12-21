@@ -4,7 +4,7 @@ import com.pokejava.PokeJava.PokeInfo;
 
 public class Battle {
 
-    private final Trainer trainer;
+    private final NPC trainer;
     private final NPC npc;
     private int indexFightingTrainerPoke;
     private int indexFightingNpcPoke;
@@ -23,7 +23,7 @@ public class Battle {
         );
     }
 
-    public Battle(Trainer trainer, NPC npc) {
+    public Battle(NPC trainer, NPC npc) {
         this.trainer = trainer;
         this.npc = npc;
 

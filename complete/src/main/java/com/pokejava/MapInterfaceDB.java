@@ -92,50 +92,17 @@ public record MapInterfaceDB(MapInterface m1, MapInterface m2) {
 
     }
 
-    // my old code
-    /* 
-    public static Map nextMap(String mapName, Position p) {
-        
-        for (int i = 0; i < inters.length; i++) {
-            if(mapName.equals(inters[i].mapName1()) && p.equals(inters[i].p1())) {
-                Position pNeu = inters[i].p2();
-                switch(inters[i].mapName2()) {
-                    case "Route 1": return new Route1(pNeu); 
-                    case "Route 2": return new Route2(pNeu); 
-                    case "Route 3": return new Route3(pNeu); 
-                    case "Route 4": return new Route4(pNeu); 
-                    case "Mystery Place": return new Mystery_Place(pNeu);
-                    case "PokeCenter": return new PokeCenter1(pNeu); 
-                    case "City of Azure": return new CityOfAzure(pNeu);
-                    default: break;
-                }
-            }
-            if(mapName.equals(inters[i].mapName2()) && p.equals(inters[i].p2())) {
-                Position pNeu = inters[i].p1();
-                switch(inters[i].mapName1()) {
-                    case "Route 1": return new Route1(pNeu); 
-                    case "Route 2": return new Route2(pNeu); 
-                    case "Route 3": return new Route3(pNeu); 
-                    case "Route 4": return new Route4(pNeu); 
-                    case "Mystery Place": return new Mystery_Place(pNeu);
-                    case "PokeCenter": return new PokeCenter1(pNeu); 
-                    case "City of Azure": return new CityOfAzure(pNeu); 
-                    default: break;
-                }
-            }
-        }
-        return null;
-    }
-    */
-
     // the super code from chat gpt
-    public static Map nextMap(String mapName, Position p) {
+    public static Map nextMap(String mapName, NPC trainer) {
+        Position p = trainer.getPos();
         for (MapInterfaceDB DB : DBs) {
             if (mapName.equals(DB.m1().mapName()) && p.equals(DB.m1().p())) {
-                return createInstance(DB.m2().mapName(), DB.m2().p());
+                trainer.setPos(DB.m2().p());
+                return createInstance(DB.m2().mapName(), trainer);
             }
             if (mapName.equals(DB.m2().mapName()) && p.equals(DB.m2().p())) {
-                return createInstance(DB.m1().mapName(), DB.m1().p());
+                trainer.setPos(DB.m1().p());
+                return createInstance(DB.m1().mapName(), trainer);
             }
         }
         return null;
@@ -162,14 +129,14 @@ public record MapInterfaceDB(MapInterface m1, MapInterface m2) {
 
     }
 
-    private static Map createInstance(String mapName, Position p) {
+    private static Map createInstance(String mapName, NPC trainer) {
         Class<?> clazz = classMapping.get(mapName);
         if (clazz != null) {
             try {
                 if (Map.class.isAssignableFrom(clazz)) {
                     // Check if the class is a subclass of MapInterface before creating an instance
                     Class<? extends Map> mapClass = (Class<? extends Map>) clazz;
-                    return mapClass.getDeclaredConstructor(Position.class).newInstance(p);
+                    return mapClass.getDeclaredConstructor(NPC.class).newInstance(trainer);
                 }
             } catch (Exception e) {
                 e.printStackTrace(); // Handle the exception according to your needs

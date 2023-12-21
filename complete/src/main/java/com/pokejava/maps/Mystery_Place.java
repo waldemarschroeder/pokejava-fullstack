@@ -34,5 +34,5 @@ public class Mystery_Place extends Map {
         };
     }
 
-    public Mystery_Place(Position trainerPos) { super(trainerPos, "Mystery Place"); }
+    public Mystery_Place(NPC trainer) { super(trainer, "Mystery Place"); }
 }

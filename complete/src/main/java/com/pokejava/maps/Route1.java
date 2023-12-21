@@ -33,6 +33,6 @@ public class Route1 extends Map {
         };
     }
 
-    public Route1(Position trainerPos) { super(trainerPos, "Route 1"); }
+    public Route1(NPC trainer) { super(trainer, "Route 1"); }
     
 }

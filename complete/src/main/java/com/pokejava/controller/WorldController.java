@@ -22,6 +22,7 @@ import com.pokejava.Map.MapInfo;
 import com.pokejava.NPC.InteractionInfo;
 import com.pokejava.PokeJava.PokeInfo;
 import com.pokejava.maps.*;
+import com.pokejava.npcs.Trainer;
 import com.pokejava.pokejavas.*;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,12 +37,11 @@ public class WorldController {
     new Waterly(5),
     new Grassie(5),
   };
-  Trainer t1 = new Trainer("Waldemar", initPokes);
-  Map m1 = new Route1(new Position(11,4));
+  Trainer t1 = new Trainer("Waldemar", new Position(11,4), initPokes);
+  Map m1 = new Route1(t1);
   
   @GetMapping("/get-map")
   public MapInfo initMap() {
-    m1.npcsAutoAction();
 		return m1.getMapInfo();
 	}
 
@@ -49,9 +49,9 @@ public class WorldController {
   // curl localhost:8080/rest/move?direction=right
   public MapInfo move(@RequestBody java.util.Map<String, String> requestBody) {
     String direction = requestBody.get("direction");
-    m1.moveTrainer(direction);
-    Map m2 = MapInterfaceDB.nextMap(m1.getName(), m1.getPosition());
-    if ( m2 != null) { m1 = m2; m1.moveTrainer(direction); }
+    t1.move(m1, direction);
+    Map m2 = MapInterfaceDB.nextMap(m1.getName(), t1);
+    if ( m2 != null) { m1 = m2; t1.move(m1, direction); }
 		return m1.getMapInfo();
 	}
 
@@ -73,11 +73,21 @@ public class WorldController {
   @PostMapping("/get-interaction")
   public InteractionInfo getInteraction(@RequestBody java.util.Map<String, String> requestBody) { 
     String userAnswer = requestBody.get("userAnswer");
-    InteractionInfo i1 = m1.npcInteraction(userAnswer, t1.getPokes()); 
+    InteractionInfo i1 = m1.npcInteraction(userAnswer); 
+    // when user press enter anywhere
     if (i1 == null) { return null;}
-    if (i1.battle()) { b1 = new Battle(t1, i1.npc()); }
+    if (i1.battle() != null) { b1 = i1.battle(); }
     return i1;
   }
+
+  @GetMapping("/update-npcs")
+  public InteractionInfo updateNpcs() {
+    InteractionInfo i1 = m1.npcsAutoAction();
+    if (i1 == null) { return null; }
+    if (i1.battle() != null) { b1 = i1.battle(); }
+    return i1;
+  }
+  
 
   @PostMapping("/change-pokejavas-order")
   public PokeInfo[] change(@RequestBody java.util.Map<String, Integer> requestBody) { 

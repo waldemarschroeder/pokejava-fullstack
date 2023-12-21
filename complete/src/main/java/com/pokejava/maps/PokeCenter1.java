@@ -29,6 +29,6 @@ public class PokeCenter1 extends Map {
         };
     }
 
-    public PokeCenter1(Position trainerPos) { super(trainerPos, "PokeCenter Route 3"); }
+    public PokeCenter1(NPC trainer) { super(trainer, "PokeCenter Route 3"); }
     
 }
