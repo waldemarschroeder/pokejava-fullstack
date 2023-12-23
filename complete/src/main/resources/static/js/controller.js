@@ -1,11 +1,30 @@
 // speak with API
 const host = "http://localhost:8080/rest";
 
-async function fetchAsync (context) {
-  url = host + context;
-  let response = await fetch(url);
-  let data = await response.json();
-  return data;
+async function fetchAsync(context) {
+  const url = host + context;
+
+  try {
+    let response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    // Check if the response has content before parsing as JSON
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      let data = await response.json();
+      return data;
+    } else {
+      // Handle cases where the response is not JSON
+      //console.warn("Response does not contain JSON data");
+      return null;
+    }
+  } catch (error) {
+    console.error("An error occurred during fetchAsync:", error);
+    throw error; // Rethrow the error to handle it in the calling code
+  }
 }
 
 async function postAsync (context, postData) {
@@ -38,36 +57,37 @@ function initMap() {
 }
 initMap();
 
-// update map
-function updateMap() {
+// update npcs in map
+async function updateNpcsInMap() {
+  try {
+    const updateNpcsData = await fetchAsync("/update-npcs");
 
-  fetchAsync("/update-npcs")
-    .then(data => { 
-      if (data === null) { return; }
+    if (updateNpcsData !== null) {
       appendNpcInteraction();
-      appendDialogBox(data.npcAnswer);
-      if (data.possibleUserAnswers !== null) { appendAnswerBtns(data.possibleUserAnswers); }
-      if (data.battle) { 
-        // wait 2 s
-        setTimeout(function() { initBattle(); }, 2000); 
+      appendDialogBox(updateNpcsData.npcAnswer);
+
+      if (updateNpcsData.possibleUserAnswers !== null) {
+        appendAnswerBtns(updateNpcsData.possibleUserAnswers);
       }
-    })
-      .catch(()=>{
-        ///Exception occured do something
-      });
-  
-  fetchAsync("/get-map")
-    .then(data => { 
-      moveNpcsInMap(data.matrixString, data.npcsPos);
-      // update trainer position in map always
-      updateTrainerInMap(data.matrixString, data.trainerPos, data.trainerDirection); 
-      currentTrainerPos = data.trainerPos;
-      scrollToTarget(data.trainerPos); 
-    })
-      .catch(()=>{
-        ///Exception occured do something
-      });
-  
+
+      if (updateNpcsData.battle) {
+        // wait 2 s
+        setTimeout(function () {
+          initBattle();
+        }, 2000);
+      }
+    } else {
+      // Handle the case when updateNpcsData is null
+      //console.warn("Update NPCs data is null");
+      //return; // Exit the function to prevent executing the next await
+    }
+
+    const getMapData = await fetchAsync("/get-map");
+    moveNpcsInMap(getMapData.matrixString, getMapData.npcsPos);
+  } catch (error) {
+    // Handle exceptions
+    console.error("An error occurred:", error);
+  }
 }
 
 // apiMoving
@@ -75,8 +95,7 @@ function apiMoving(direction) {
   // {direction} -> {"direction":"up"}
   postAsync("/move", {direction})
     .then(data => { 
-      if (!data.trainerMayMove) { return; }
-      rmElementById("npcInteraction");
+      if (data.trainerMayMove) { rmElementById("npcInteraction"); }
       // render map only when map has changed, map rendering is expensive
       if (!(JSON.stringify(currentMapName) === JSON.stringify(data.name))) {
         renderMap(data);
@@ -86,8 +105,6 @@ function apiMoving(direction) {
       currentTrainerPos = data.trainerPos;
       scrollToTarget(data.trainerPos); 
 
-      //moveNpcsInMap(data.matrixString, data.npcsPos);
-      //console.log(data.battle); 
     })
       .catch(()=>{
         ///Exception occured do something
@@ -98,6 +115,7 @@ function apiMoving(direction) {
 function interaction(userAnswer) {
   postAsync("/get-interaction", {userAnswer})
     .then(data => { 
+      appendNpcInteraction(); 
       appendDialogBox(data.npcAnswer);
       if (data.possibleUserAnswers !== null) { appendAnswerBtns(data.possibleUserAnswers); }
       if (data.battle) { 
@@ -141,7 +159,7 @@ function checkKey(e) {
     case 39: apiMoving("right"); break;
 
     // Enter key
-    case 13: appendNpcInteraction(); interaction("bla"); break;
+    case 13: interaction("bla"); break;
 
     default:
       // Handle other cases or do nothing
@@ -150,5 +168,5 @@ function checkKey(e) {
 
 }
 
-// Update the map every 0,75 seconds
-setInterval(updateMap, 750);
+// Update the npcs in map every 0,75 seconds
+setInterval(updateNpcsInMap, 750);

@@ -93,14 +93,25 @@ public record MapInterfaceDB(MapInterface m1, MapInterface m2) {
     }
 
     // the super code from chat gpt
-    public static Map nextMap(String mapName, NPC trainer) {
+    public static Map nextMap(Map initMap) {
+        String mapName = initMap.getInitName();
+        NPC trainer = initMap.getTrainer();
         Position p = trainer.getPos();
+
         for (MapInterfaceDB DB : DBs) {
             if (mapName.equals(DB.m1().mapName()) && p.equals(DB.m1().p())) {
+                // Entry Field where trainer was -> unblocked
+                initMap.fieldSetIsAccessable(p, true);
+                
+                // trainer has new position in new map
                 trainer.setPos(DB.m2().p());
                 return createInstance(DB.m2().mapName(), trainer);
             }
             if (mapName.equals(DB.m2().mapName()) && p.equals(DB.m2().p())) {
+                // Entry Field where trainer was -> unblocked
+                initMap.fieldSetIsAccessable(p, true);
+                
+                // trainer has new position in new map
                 trainer.setPos(DB.m1().p());
                 return createInstance(DB.m1().mapName(), trainer);
             }
@@ -136,7 +147,9 @@ public record MapInterfaceDB(MapInterface m1, MapInterface m2) {
                 if (Map.class.isAssignableFrom(clazz)) {
                     // Check if the class is a subclass of MapInterface before creating an instance
                     Class<? extends Map> mapClass = (Class<? extends Map>) clazz;
-                    return mapClass.getDeclaredConstructor(NPC.class).newInstance(trainer);
+                    Map map = mapClass.getDeclaredConstructor().newInstance();
+                    map.setTrainer(trainer);
+                    return map;
                 }
             } catch (Exception e) {
                 e.printStackTrace(); // Handle the exception according to your needs

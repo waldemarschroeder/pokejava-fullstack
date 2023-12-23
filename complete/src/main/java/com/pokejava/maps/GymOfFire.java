@@ -5,6 +5,9 @@ import com.pokejava.*;
 public class GymOfFire extends Map {
 
     @Override
+    public String getInitName() { return "Gym of Fire"; }
+
+    @Override
     // PokeCenter1 in Route 3
     public String[][] getInitMatrixString() {
         return new String[][]{
@@ -29,7 +32,5 @@ public class GymOfFire extends Map {
             new NPC(new Position(6, 3)), 
         };
     }
-
-    public GymOfFire(NPC trainer) { super(trainer, "Gym of Fire"); }
     
 }

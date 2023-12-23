@@ -6,6 +6,9 @@ import com.pokejava.npcs.PokeCenterLady;
 public class PokeCenter1 extends Map {
 
     @Override
+    public String getInitName() { return "PokeCenter Route 3"; }
+
+    @Override
     // PokeCenter1 in Route 3
     public String[][] getInitMatrixString() {
         return new String[][]{
@@ -28,7 +31,5 @@ public class PokeCenter1 extends Map {
             new PokeCenterLady(new Position(2, 4)), 
         };
     }
-
-    public PokeCenter1(NPC trainer) { super(trainer, "PokeCenter Route 3"); }
     
 }

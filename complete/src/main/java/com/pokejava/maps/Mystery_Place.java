@@ -5,6 +5,9 @@ import com.pokejava.*;
 public class Mystery_Place extends Map {
 
     @Override
+    public String getInitName() { return "Mystery Place"; }
+
+    @Override
     // Mystery Place above Rout3
     public String[][] getInitMatrixString() {
         return new String[][]{
@@ -34,5 +37,4 @@ public class Mystery_Place extends Map {
         };
     }
 
-    public Mystery_Place(NPC trainer) { super(trainer, "Mystery Place"); }
 }

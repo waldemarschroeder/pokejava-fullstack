@@ -158,7 +158,7 @@ function updateTrainerInMap(matrix, trainerPos, trainerDirection) {
 
 }
 
-function updateNpcsInMap(matrix, npcsPos, placeORdelete) {
+function IOnpcsInMap(matrix, npcsPos, placeORdelete) {
   
   for(i = 0; i < npcsPos.length; i++) {
     npcPos = npcsPos[i];
@@ -172,17 +172,18 @@ function updateNpcsInMap(matrix, npcsPos, placeORdelete) {
 }
 
 function moveNpcsInMap(matrixString, npcsPos) {
-  if (currentNpcsPos != npcsPos) {
+
+  if (!(npcsPos === currentNpcsPos)) {
     // old npc places delete
-    updateNpcsInMap(matrixString, currentNpcsPos, false);
-    
-    // new npc places 
-    updateNpcsInMap(matrixString, npcsPos, true);
-    
+    IOnpcsInMap(matrixString, currentNpcsPos, false);
+  
+    // new npc places
+    IOnpcsInMap(matrixString, npcsPos, true);
+  
     // update currentNpcs
     currentNpcsPos = npcsPos;
   }
-}
+}  
 
 function scrollToTarget(trainerPos) {
 

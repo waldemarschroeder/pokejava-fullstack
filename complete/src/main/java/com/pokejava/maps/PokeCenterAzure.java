@@ -6,6 +6,9 @@ import com.pokejava.npcs.PokeCenterLady;
 public class PokeCenterAzure extends Map {
 
     @Override
+    public String getInitName() { return "PokeCenter Azure"; }
+
+    @Override
     // PokeCenter in City of Azure
     public String[][] getInitMatrixString() {
         return new String[][]{
@@ -28,7 +31,5 @@ public class PokeCenterAzure extends Map {
             new PokeCenterLady(new Position(2, 4)), 
         };
     }
-
-    public PokeCenterAzure(NPC trainer) { super(trainer, "PokeCenter Azure"); }
     
 }

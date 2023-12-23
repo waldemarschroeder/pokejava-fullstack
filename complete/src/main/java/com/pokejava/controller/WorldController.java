@@ -1,5 +1,6 @@
 package com.pokejava.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +39,16 @@ public class WorldController {
     new Grassie(5),
   };
   Trainer t1 = new Trainer("Waldemar", new Position(11,4), initPokes);
-  Map m1 = new Route1(t1);
+  Map m1;
+  // Create an ArrayList to store maps
+  List<Map> mapsList;
+
+  public WorldController() {
+    // Initialize m1 and set the trainer within the constructor
+    m1 = new Route1();
+    m1.setTrainer(t1);
+    mapsList = new ArrayList<>(Arrays.asList(m1));
+  }
   
   @GetMapping("/get-map")
   public MapInfo initMap() {
@@ -46,14 +56,38 @@ public class WorldController {
 	}
 
   @PostMapping("/move")
-  // curl localhost:8080/rest/move?direction=right
   public MapInfo move(@RequestBody java.util.Map<String, String> requestBody) {
     String direction = requestBody.get("direction");
     t1.move(m1, direction);
-    Map m2 = MapInterfaceDB.nextMap(m1.getName(), t1);
-    if ( m2 != null) { m1 = m2; t1.move(m1, direction); }
-		return m1.getMapInfo();
-	}
+    Map newMap = MapInterfaceDB.nextMap(m1);
+
+    if (newMap != null) {
+      Map updatedMap = handleMapUpdate(newMap);
+      if (updatedMap != null) {
+        m1 = updatedMap;
+      }
+      t1.move(m1, direction);
+    }
+
+    return m1.getMapInfo();
+  }
+
+  private Map handleMapUpdate(Map newMap) {
+    boolean listHasMap = mapsList.stream()
+            .filter(Objects::nonNull)
+            .anyMatch(map -> Objects.equals(newMap.getInitName(), map.getInitName()));
+
+    if (!listHasMap) {
+      mapsList.add(newMap);
+      return newMap;
+    } else {
+      return mapsList.stream()
+              .filter(Objects::nonNull)
+              .filter(map -> Objects.equals(newMap.getInitName(), map.getInitName()))
+              .findFirst()
+              .orElse(null);
+    }
+  }
 
   @GetMapping("/get-pokejavas")
   public PokeInfo[] getPokeJavas() {

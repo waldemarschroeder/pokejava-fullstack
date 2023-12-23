@@ -6,6 +6,9 @@ import com.pokejava.npcs.Route3TopNpc;
 public class Route3 extends Map {
 
     @Override
+    public String getInitName() { return "Route 3"; }
+
+    @Override
     // route3 right from route1
     public String[][] getInitMatrixString() {
         return new String[][]{
@@ -34,7 +37,5 @@ public class Route3 extends Map {
             new NPC(new Position(12, 9)),
         };
     }
-
-    public Route3(NPC trainer) { super(trainer, "Route 3"); }
     
 }

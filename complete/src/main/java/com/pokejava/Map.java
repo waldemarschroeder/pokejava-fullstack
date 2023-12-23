@@ -5,10 +5,12 @@ import com.pokejava.NPC.InteractionInfo;
 public class Map {
 
     private String name;
-    public String getName() { return this.name; }
+    //public String getName() { return this.name; }
+    public String getInitName() { return null; } // Override
 
     private NPC trainer;
     public NPC getTrainer() { return this.trainer; }
+    public void setTrainer(NPC trainer) { this.trainer = trainer; }
 
     protected boolean trainerMayMove = true;
     public boolean getTrainerMayMove() { return this.trainerMayMove; }
@@ -52,10 +54,10 @@ public class Map {
         return maxLength;
     }
 
-    public Map (NPC trainer, String name) {
-        this.trainer = trainer;
+    public Map() {
+        //this.trainer = trainer;
         this.matrixString = this.getInitMatrixString();
-        this.name = name;
+        this.name = this.getInitName();
         this.npcs = this.getInitNpcs();    
 
         MapInterface[] inters = MapInterfaceDB.inters(this.name);

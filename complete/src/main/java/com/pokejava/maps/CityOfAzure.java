@@ -1,8 +1,12 @@
 package com.pokejava.maps;
 
 import com.pokejava.*;
+import com.pokejava.npcs.COApoolNPC;
 
 public class CityOfAzure extends Map {
+
+    @Override
+    public String getInitName() { return "City of Azure"; }
 
     @Override
     // City of Azure above of Route 2, left of Route 4
@@ -34,12 +38,10 @@ public class CityOfAzure extends Map {
         return new NPC[] { 
             new NPC(new Position(7, 12)), 
             new NPC(new Position(1, 35)),
-            new NPC(new Position(12, 32)),
+            new COApoolNPC(new Position(12, 32)),
             new NPC(new Position(7, 45)),
             new NPC(new Position(13, 43)),
         };
     }
-
-    public CityOfAzure(NPC trainer) { super(trainer, "City of Azure"); }
     
 }

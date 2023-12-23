@@ -1,22 +1,19 @@
 package com.pokejava.npcs;
 
 import com.pokejava.*;
-import com.pokejava.pokejavas.*;
 
-public class Route4RightNPC extends NPC {
+public class COApoolNPC extends NPC {
 
     // Override
     @Override
     public InteractionInfo interacted(String userAnswer, NPC trainer) { 
-        if (!defeated) {
-            return new InteractionInfo("I saw you and now we will battle.", null, new Battle(trainer, this)); 
-        } else {
-            return new InteractionInfo("Leave me alone.", null, null); 
-        }
+        return new InteractionInfo("Welcome to the best City: City of Azure.", null, null); 
     }
 
-    public Route4RightNPC(Position p) { super("David", p, new PokeJava[]{ new Firely(4),}); }
+    public COApoolNPC(Position p) { super(p); }
     
+    private Position trainerPosAction1 = new Position(16, 25);
+    private Position trainerPosAction2 = new Position(9, 49);
     // Override
     @Override
     public void setTrainerSeen(Map map) {
@@ -26,10 +23,9 @@ public class Route4RightNPC extends NPC {
 
         if (trainerContacted) {
             this.trainerSeen = false; 
-        } else if (this.p.x() == trainerPos.x()) {
+        } else if (trainerPos.equals(trainerPosAction1) || trainerPos.equals(trainerPosAction2)) {
             this.trainerSeen = true;
             map.setTrainerMayMove(false);
-            setDirectionToNpc(map.getTrainer());
         }
     }
 
@@ -41,24 +37,21 @@ public class Route4RightNPC extends NPC {
         Position targetPos = map.getTrainer().getTargetPosition();
 
         // only one npc answer
-        if (defeated && !p.equals(initPos)) { 
+        if (trainerContacted && !p.equals(initPos)) { 
             // Find the way back
             findNextMove(map, this.p, initPos); 
             return null;
         }
 
-        // if npc is defeated, let the trainer go
-        // why is the line not nes. ?
-        if (defeated) { map.setTrainerMayMove(true); }
-
         if (trainerSeen && !trainerContacted) {
-            if(p.equals(targetPos)) {
-                //map.setTrainerMayMove(true);
+            if(this.p.equals(targetPos)) {
                 this.trainerContacted = true;
+                map.setTrainerMayMove(true);
                 return interacted(null, map.getTrainer());
+            } else {
+                // Find the next move towards the trainer
+                findNextMove(map, this.p, targetPos);
             }
-            //move(map, "down");
-            findNextMove(map, p, targetPos);
         }
         return null;
 

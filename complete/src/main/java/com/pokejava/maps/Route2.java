@@ -5,6 +5,9 @@ import com.pokejava.*;
 public class Route2 extends Map {
 
     @Override
+    public String getInitName() { return "Route 2"; }
+
+    @Override
     // route2 left from route1
     public String[][] getInitMatrixString() {
         return new String[][]{
@@ -34,7 +37,5 @@ public class Route2 extends Map {
             new NPC(new Position(9, 17)),
         };
     }
-
-    public Route2(NPC trainer) { super(trainer, "Route 2"); }
     
 }

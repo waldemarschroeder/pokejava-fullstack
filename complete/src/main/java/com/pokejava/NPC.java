@@ -11,6 +11,8 @@ public class NPC {
     public Position getPos() { return this.p;}
     public void setPos(Position p) { this.p = p;}
 
+    protected Position initPos;
+
     protected String direction = "up"; // "up" init value
     public String getDirection() { return this.direction; }
     public void setDirection(String direction) { this.direction = direction; }
@@ -77,11 +79,12 @@ public class NPC {
         return target;
     }
 
-    public NPC(Position p) { this.p = p; }
+    public NPC(Position p) { this.p = p; this.initPos = p; }
 
     public NPC(String name, Position p, PokeJava[] pokes) {
         this.name = name;
         this.p = p;
+        this.initPos = p;
         this.pokes = pokes;
     }
 
@@ -91,6 +94,49 @@ public class NPC {
         } catch (Exception e) {
             throw new RuntimeException("Error creating NPC from class " + npcClass, e);
         }
+    }
+
+    protected void findNextMove(Map map, Position currentPosition, Position targetPosition) {
+        int dx = targetPosition.x() - currentPosition.x();
+        int dy = targetPosition.y() - currentPosition.y();
+
+        String direction;
+        // Prioritize the axis with the bigger distance
+        if (Math.abs(dx) > Math.abs(dy)) {
+            // Try move horizontally first
+            direction = (dx > 0) ? "right" : "left";
+            if (move(map, direction)) {
+                return; // Exit the method if the horizontal move is successful
+            }
+            // If not successful, try move vertically
+            direction = (dy > 0) ? "down" : "up";
+            move(map, direction);
+        } else {
+            // Try move vertically first
+            direction = (dy > 0) ? "down" : "up";
+            if (move(map, direction)) {
+                return; // Exit the method if the vertical move is successful
+            }
+            // If not successful, try move horizontally
+            direction = (dx > 0) ? "right" : "left";
+            move(map, direction);
+        }
+
+    }
+
+    protected void setDirectionToNpc(NPC npc) {
+        int dx = npc.getPos().x() - p.x();
+        int dy = npc.getPos().y() - p.y();
+    
+        String direction;
+        if (Math.abs(dx) > Math.abs(dy)) {
+            // Move horizontally
+            direction = (dx < 0) ? "right" : "left";
+        } else {
+            // Move vertically
+            direction = (dy < 0) ? "down" : "up";
+        }
+        npc.setDirection(direction);
     }
 
 }

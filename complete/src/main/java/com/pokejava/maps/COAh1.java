@@ -5,6 +5,9 @@ import com.pokejava.*;
 public class COAh1 extends Map {
 
     @Override
+    public String getInitName() { return "House 1 in Azure"; }
+
+    @Override
     // House1 in City of Azure
     public String[][] getInitMatrixString() {
         return new String[][]{
@@ -27,7 +30,5 @@ public class COAh1 extends Map {
             new NPC(new Position(6, 7)), 
         };
     }
-
-    public COAh1(NPC trainer) { super(trainer, "House 1 in Azure"); }
     
 }
