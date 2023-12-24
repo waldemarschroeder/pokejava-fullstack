@@ -1,7 +1,9 @@
 package com.pokejava.maps;
 
 import com.pokejava.*;
-import com.pokejava.npcs.Route4RightNPC;
+import com.pokejava.Field.PokeOccur;
+import com.pokejava.npcs.*;
+import com.pokejava.pokejavas.*;
 
 public class Route4 extends Map {
 
@@ -33,6 +35,14 @@ public class Route4 extends Map {
         return new NPC[] { 
             new NPC(new Position(1, 4)), 
             new Route4RightNPC(new Position(1, 9)),
+        };
+    }
+
+    @Override
+    protected PokeOccur[] pokesOccur() {
+        return new PokeOccur[] {
+            new PokeOccur(0.7, Firely.class, new int[]{3, 6}),
+            new PokeOccur(0.3, Waterly.class, new int[]{3, 6}),
         };
     }
     

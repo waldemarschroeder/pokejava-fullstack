@@ -8,6 +8,9 @@ import com.pokejava.maps.*;
 
 public record MapInterfaceDB(MapInterface m1, MapInterface m2) {
 
+    // String type; // may be "houseEntry", "mapExit"
+    public record MapInterface(String type, String mapName, Position p) {}
+
     static MapInterfaceDB r1r2 = new MapInterfaceDB(
         new MapInterface("mapExit", "Route 1", new Position(5, 0)),
         new MapInterface("mapExit", "Route 2", new Position(6, 23))

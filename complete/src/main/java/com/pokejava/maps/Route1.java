@@ -1,7 +1,9 @@
 package com.pokejava.maps;
 
 import com.pokejava.*;
+import com.pokejava.Field.PokeOccur;
 import com.pokejava.npcs.*;
+import com.pokejava.pokejavas.*;
 
 public class Route1 extends Map {
 
@@ -10,7 +12,7 @@ public class Route1 extends Map {
 
     @Override
     // route1 Startmap
-    public String[][] getInitMatrixString() {
+    protected String[][] getInitMatrixString() {
         return new String[][]{
             {"B","B","B","B","B","B","B","B","B"},
             {"B","G","G","S","S","S","G","G","B"},
@@ -29,10 +31,18 @@ public class Route1 extends Map {
     }
 
     @Override
-    public NPC[] getInitNpcs() {
+    protected NPC[] getInitNpcs() {
         return new NPC[] { 
             new Route1LeftNPC(new Position(4, 2)), 
             new Route1RightNPC(new Position(2, 7)),
+        };
+    }
+
+    @Override
+    protected PokeOccur[] pokesOccur() {
+        return new PokeOccur[] {
+            new PokeOccur(0.7, Firely.class, new int[]{2, 3}),
+            new PokeOccur(0.3, Normie.class, new int[]{3, 4}),
         };
     }
     

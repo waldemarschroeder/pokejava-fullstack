@@ -1,50 +1,67 @@
 package com.pokejava;
 
 import java.util.Random;
-//import java.util.stream.DoubleStream;
 
 public class Field {
-    // type="S" -> "street", "G" -> "grass", "W" -> "water", "B" -> "black", "E" -> "entry" to another map, "SNOW"
+
     private String type;
-    public String getType() { return this.type; }
     private boolean isTherePoke = false;
-    public boolean getIsTherePoke() { return this.isTherePoke; }
+    private PokeJava wildPoke;
     private boolean isAccessable = true;
-    public boolean getIsAccessable () { return this.isAccessable; }
-    public void setIsAccessable(boolean isAccessable) { this.isAccessable = isAccessable; }
-    
-    public Field (String type){
+
+    // Define the record for Pokemon occurrences
+    public record PokeOccur(double classProb, Class<? extends PokeJava> pokeClass, int[] lvlRange) {}
+
+    public Field(String type, PokeOccur[] pokesOccur) {
         this.type = type;
         Random random = new Random();
-        
+
         if (this.type != null && !this.type.isEmpty()) {
-            if (this.type.equals("G") && random.nextFloat() < 0.3) {
+            if (this.type.equals("G") && random.nextFloat() < GrassProbabilityThreshold.PROBABILITY) {
                 this.isTherePoke = true;
+                if (pokesOccur == null) return;
+                this.wildPoke = randomWildPoke(pokesOccur);
             }
-            
+
             if (this.type.equals("W") || this.type.equals("B") || this.type.contains("NPC")
-                || this.type.contains("houseL") || this.type.contains("houseR") || this.type.equals("houseMUH"))  {
+                    || this.type.contains("houseL") || this.type.contains("houseR") || this.type.equals("houseMUH")) {
                 this.isAccessable = false;
             }
         }
     }
 
-    // field types not random anymore
-    /* static String randomType() {
-        String[] types = {"street","grass","water","black","entry"}; // entry to another map
-        double[] probs = {25, 40, 20}; // 25% Street, 40% Grass, 20% Blocked
-        double totalProbs = DoubleStream.of(probs).sum();
+    private PokeJava randomWildPoke(PokeOccur[] pokesOccur) {
         Random random = new Random();
-        //int index = random.nextInt(types.length);
+        double rand = random.nextDouble();
+        double cumulativeProb = 0.0;
 
-        double x = random.nextDouble() * totalProbs;
-        for (int i = 0; i < probs.length; ++i) {
-            x -= probs[i];
-            if (x <= 0) {return types[i];}
+        for (int i = 0; i < pokesOccur.length; i++) {
+            cumulativeProb += pokesOccur[i].classProb();
+            if (rand < cumulativeProb) {
+                int[] lvlRange = pokesOccur[i].lvlRange();
+                int randomLevel = random.nextInt(lvlRange[1] - lvlRange[0] + 1) + lvlRange[0];
+                try {
+                    return pokesOccur[i].pokeClass().getConstructor(int.class).newInstance(randomLevel);
+                } catch (Exception e) {
+                    // Handle the exception, log or rethrow if necessary
+                    e.printStackTrace();
+                }
+            }
         }
-        return types[types.length - 1];
+        return null;
     }
 
-    public static String type = randomType(); */
+    public String getType() { return this.type; }
 
+    public boolean getIsTherePoke() { return this.isTherePoke; }
+
+    public PokeJava getWildPoke() { return this.wildPoke; }
+
+    public boolean getIsAccessable() { return this.isAccessable; }
+    public void setIsAccessable(boolean isAccessable) { this.isAccessable = isAccessable; }
+    
+    // Define a constant for Grass probability threshold
+    private static class GrassProbabilityThreshold {
+        public static final double PROBABILITY = 0.3;
+    }
 }

@@ -41,8 +41,8 @@ public class NPC {
 
     protected boolean trainerContacted = false;
     protected boolean trainerSeen = false;
-    // Override
-    public void setTrainerSeen(Map map) {};
+    public boolean getTrainerSeen() { return this.trainerSeen; }
+    public void setTrainerSeen(NPC trainer) {}; // Override
 
     public record InteractionInfo(String npcAnswer, String[] possibleUserAnswers, Battle battle) {};
     
@@ -50,7 +50,7 @@ public class NPC {
     public InteractionInfo interacted(String userAnswer, NPC trainer) { return new InteractionInfo("hi", null, null); }
 
     //Override
-    public InteractionInfo autoAction(Map map) { return null; }
+    public boolean autoAction(Map map) { return false; }
 
     public boolean move(Map map, String direction) {
 
@@ -62,7 +62,10 @@ public class NPC {
         if (map.mayMove(target)) {
             map.moveObj(this.p, target);
             this.p = target;
-            if (this.getClass() == Trainer.class) { map.npcsTrainerSeen(); }
+            if (this.getClass() == Trainer.class) { 
+                map.npcsTrainerSeen(); // true or false unhandled
+                map.wildPokeAttacked(); // true or false unhandled
+            }
             return true;
         } else { return false; }
     }
@@ -86,14 +89,6 @@ public class NPC {
         this.p = p;
         this.initPos = p;
         this.pokes = pokes;
-    }
-
-    public static NPC createNpcFromClass(Class<? extends NPC> npcClass) {
-        try {
-            return npcClass.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating NPC from class " + npcClass, e);
-        }
     }
 
     protected void findNextMove(Map map, Position currentPosition, Position targetPosition) {

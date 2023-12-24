@@ -1,11 +1,12 @@
 package com.pokejava;
 
+import com.pokejava.Field.PokeOccur;
+import com.pokejava.MapInterfaceDB.MapInterface;
 import com.pokejava.NPC.InteractionInfo;
 
 public class Map {
 
     private String name;
-    //public String getName() { return this.name; }
     public String getInitName() { return null; } // Override
 
     private NPC trainer;
@@ -16,21 +17,23 @@ public class Map {
     public boolean getTrainerMayMove() { return this.trainerMayMove; }
     public void setTrainerMayMove(boolean trainerMayMove) { this.trainerMayMove = trainerMayMove; }
 
-    protected boolean battle = false;
-    public void setBattle(boolean battle) { this.battle = battle; }
+    protected PokeJava wildPoke;
+    //public void setBattle(boolean battle) { this.battle = battle; }
+
+    protected PokeOccur[] pokesOccur() { return null; } // Override
 
     private String[][] matrixString;
-    public String[][] getInitMatrixString() { return null; } // Override
+    protected String[][] getInitMatrixString() { return null; } // Override
 
     private Field[][] matrixField;
 
-    public record MapInfo(String name, String[][] matrixString, Position trainerPos, String trainerDirection, boolean trainerMayMove, Position[] npcsPos, boolean battle) {}
+    public record MapInfo(String name, String[][] matrixString, Position trainerPos, String trainerDirection, boolean trainerMayMove, Position[] npcsPos, PokeJava wildPoke) {}
     public MapInfo getMapInfo() {
-        return new MapInfo(this.name, this.matrixString, this.trainer.getPos(), this.trainer.getDirection(), this.trainerMayMove, this.getNpcsPos(), this.battle);
+        return new MapInfo(this.name, this.matrixString, this.trainer.getPos(), this.trainer.getDirection(), this.trainerMayMove, this.getNpcsPos(), this.wildPoke);
     }
 
     private NPC[] npcs;
-    public NPC[] getInitNpcs() { return null; } // Override
+    protected NPC[] getInitNpcs() { return null; } // Override
     public Position[] getNpcsPos() {
         Position[] npcPositions = new Position[npcs.length]; // Assuming npcs is an array
         for (int i = 0; i < npcs.length; i++) {
@@ -55,7 +58,7 @@ public class Map {
     }
 
     public Map() {
-        //this.trainer = trainer;
+
         this.matrixString = this.getInitMatrixString();
         this.name = this.getInitName();
         this.npcs = this.getInitNpcs();    
@@ -82,7 +85,7 @@ public class Map {
         // you must initialize everything
         for (int i = 0; i < this.matrixString.length; i++) {
             for (int j = 0; j < this.matrixString[i].length; j++) {
-                this.matrixField[i][j] = new Field(this.matrixString[i][j]);
+                this.matrixField[i][j] = new Field(this.matrixString[i][j], this.pokesOccur());
             }
         }
         
@@ -122,11 +125,11 @@ public class Map {
                 if (activeNpc.possibleUserAnswers() != null) { this.trainerMayMove = false; }
                 else if (activeNpc.battle() != null) { 
                     this.trainerMayMove = false; 
-                    this.battle = true;
+                    //this.battle = true;
                 }
                 else {
                     this.trainerMayMove = true; 
-                    this.battle = false;
+                    //this.battle = false;
                 }
                 return activeNpc; 
             }
@@ -135,22 +138,33 @@ public class Map {
         
     }
 
-    private boolean wildPokeAttacked() {
+    public boolean wildPokeAttacked() {
         Position trainerPos = this.trainer.getPos();
-        return this.matrixField[trainerPos.y()][trainerPos.x()].getIsTherePoke();
+        this.wildPoke = this.matrixField[trainerPos.y()][trainerPos.x()].getWildPoke();
+        if (wildPoke != null) { return true; }
+        else { return false; }
     }
 
-    public InteractionInfo npcsAutoAction() {
+    // true if one npc wants to interact
+    public boolean npcsAutoAction() {
         // activate autoAction from every npc 
         for (NPC npc : npcs) { 
-            InteractionInfo tmp = npc.autoAction(this); 
-            if (tmp != null) { return tmp; }
+            if (npc.autoAction(this)) { return true; }
         }
-        return null;
+        return false;
     }
 
-    public void npcsTrainerSeen() {
-        for (NPC npc : npcs) { npc.setTrainerSeen(this); }
+    // true if one npc saw the trainer
+    public boolean npcsTrainerSeen() {
+        for (NPC npc : npcs) { 
+            npc.setTrainerSeen(trainer); 
+            if (npc.getTrainerSeen()) {
+                setTrainerMayMove(false);
+                npc.setDirectionToNpc(trainer);
+                return true;
+            }
+        }
+        return false;
     }
 
     

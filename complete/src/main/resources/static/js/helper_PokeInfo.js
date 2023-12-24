@@ -253,14 +253,9 @@ function appendPokeSwap(lengthPokeArray) {
 }
 
 // API change pokejavas order
-
-function changePokeJavasOrder(oldIndex, newIndex) {
-    postAsync("/change-pokejavas-order", {oldIndex, newIndex})
-      .then(data => { 
-        appendPokeInfo(data);
-      })
-        .catch(()=>{
-          ///Exception occured do something
-        });
+async function changePokeJavasOrder(oldIndex, newIndex) {
+    const changed = await postAsync("/change-pokejavas-order", {oldIndex, newIndex});
+    const data = await fetchAsync("/get-pokejavas");
+    appendPokeInfo(data);
 }
   

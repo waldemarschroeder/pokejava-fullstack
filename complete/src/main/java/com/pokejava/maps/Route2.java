@@ -1,6 +1,8 @@
 package com.pokejava.maps;
 
 import com.pokejava.*;
+import com.pokejava.Field.PokeOccur;
+import com.pokejava.pokejavas.*;
 
 public class Route2 extends Map {
 
@@ -35,6 +37,14 @@ public class Route2 extends Map {
         return new NPC[] { 
             new NPC(new Position(3, 19)), 
             new NPC(new Position(9, 17)),
+        };
+    }
+
+    @Override
+    protected PokeOccur[] pokesOccur() {
+        return new PokeOccur[] {
+            new PokeOccur(0.7, Waterly.class, new int[]{3, 5}),
+            new PokeOccur(0.3, Grassie.class, new int[]{3, 4}),
         };
     }
     

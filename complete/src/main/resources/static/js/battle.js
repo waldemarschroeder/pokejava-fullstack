@@ -229,25 +229,27 @@ function appendAttackBtns(pokeAttacks, appendAttBtnsTo) {
 
         // Use an IIFE to capture the current value of i
         (function (index) {
-            newButton.addEventListener('click', () => {
-                postAsync("/update-battle", { "userChoice": index })
-                    .then(data => {
-
-                        if (!data.active) { back2Map(); }
-
-                        // build battleField
-                        const battleField = document.getElementById("battleField");
-                        appendBattleField(battleField, data);
-
-                        // build battleMenu
-                        const battleMenu = document.getElementById("battleMenu");
-                        appendBattleMenu(battleMenu, data.trainerPoke.attacks);
-                    })
-                    .catch(() => {
-                        // Exception occurred, do something
-                    });
+            newButton.addEventListener('click', async () => {
+                try {
+                    const update = await postAsync("/update-battle", { "userChoice": index });
+        
+                    const data = await fetchAsync("/get-battleinfo");
+                    if (!data.active) { back2Map(); }
+        
+                    // build battleField
+                    const battleField = document.getElementById("battleField");
+                    appendBattleField(battleField, data);
+        
+                    // build battleMenu
+                    const battleMenu = document.getElementById("battleMenu");
+                    appendBattleMenu(battleMenu, data.trainerPoke.attacks);
+                } catch (error) {
+                    // Handle errors
+                    console.error(error);
+                }
             });
         })(i);
+        
 
         // Append the button element to the container
         div.appendChild(newButton);

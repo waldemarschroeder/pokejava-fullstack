@@ -19,23 +19,21 @@ public class Route4RightNPC extends NPC {
     
     // Override
     @Override
-    public void setTrainerSeen(Map map) {
+    public void setTrainerSeen(NPC trainer) {
         
         // get Position of trainer
-        Position trainerPos = map.getTrainer().getPos();
+        Position trainerPos = trainer.getPos();
 
         if (trainerContacted) {
             this.trainerSeen = false; 
         } else if (this.p.x() == trainerPos.x()) {
             this.trainerSeen = true;
-            map.setTrainerMayMove(false);
-            setDirectionToNpc(map.getTrainer());
         }
     }
 
     // Override
     @Override
-    public InteractionInfo autoAction(Map map) {
+    public boolean autoAction(Map map) {
 
         // get target Position of trainer
         Position targetPos = map.getTrainer().getTargetPosition();
@@ -44,23 +42,21 @@ public class Route4RightNPC extends NPC {
         if (defeated && !p.equals(initPos)) { 
             // Find the way back
             findNextMove(map, this.p, initPos); 
-            return null;
+            return false;
         }
 
         // if npc is defeated, let the trainer go
         // why is the line not nes. ?
-        if (defeated) { map.setTrainerMayMove(true); }
+        //if (defeated) { map.setTrainerMayMove(true); }
 
         if (trainerSeen && !trainerContacted) {
             if(p.equals(targetPos)) {
-                //map.setTrainerMayMove(true);
                 this.trainerContacted = true;
-                return interacted(null, map.getTrainer());
+                return true;
             }
-            //move(map, "down");
             findNextMove(map, p, targetPos);
         }
-        return null;
+        return false;
 
     }
 

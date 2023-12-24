@@ -43,6 +43,8 @@ public class WorldController {
   // Create an ArrayList to store maps
   List<Map> mapsList;
 
+  Battle b1;
+
   public WorldController() {
     // Initialize m1 and set the trainer within the constructor
     m1 = new Route1();
@@ -55,10 +57,11 @@ public class WorldController {
 		return m1.getMapInfo();
 	}
 
+  // true if move sucessful, else false
   @PostMapping("/move")
-  public MapInfo move(@RequestBody java.util.Map<String, String> requestBody) {
+  public boolean move(@RequestBody java.util.Map<String, String> requestBody) {
     String direction = requestBody.get("direction");
-    t1.move(m1, direction);
+    if (!t1.move(m1, direction)) { return false; };
     Map newMap = MapInterfaceDB.nextMap(m1);
 
     if (newMap != null) {
@@ -69,7 +72,7 @@ public class WorldController {
       t1.move(m1, direction);
     }
 
-    return m1.getMapInfo();
+    return true;
   }
 
   private Map handleMapUpdate(Map newMap) {
@@ -102,11 +105,19 @@ public class WorldController {
     return pokeInfoArray;
 	}
 
-  Battle b1;
+  @PostMapping("/change-pokejavas-order")
+  public boolean change(@RequestBody java.util.Map<String, Integer> requestBody) { 
+    int oldIndex = requestBody.get("oldIndex"); 
+    int newIndex = requestBody.get("newIndex"); 
+    t1.changePokesOrder(oldIndex, newIndex);
+    return true;
+  }
 
   @PostMapping("/get-interaction")
   public InteractionInfo getInteraction(@RequestBody java.util.Map<String, String> requestBody) { 
+    // many npcs will read userAnswer, userAnswer = null may be not so good
     String userAnswer = requestBody.get("userAnswer");
+    if (userAnswer == null) { userAnswer = ""; }
     InteractionInfo i1 = m1.npcInteraction(userAnswer); 
     // when user press enter anywhere
     if (i1 == null) { return null;}
@@ -114,21 +125,10 @@ public class WorldController {
     return i1;
   }
 
+  // if true, a npc wants to interact
   @GetMapping("/update-npcs")
-  public InteractionInfo updateNpcs() {
-    InteractionInfo i1 = m1.npcsAutoAction();
-    if (i1 == null) { return null; }
-    if (i1.battle() != null) { b1 = i1.battle(); }
-    return i1;
-  }
-  
-
-  @PostMapping("/change-pokejavas-order")
-  public PokeInfo[] change(@RequestBody java.util.Map<String, Integer> requestBody) { 
-    int oldIndex = requestBody.get("oldIndex"); 
-    int newIndex = requestBody.get("newIndex"); 
-    t1.changePokesOrder(oldIndex, newIndex);
-    return getPokeJavas();
+  public boolean updateNpcs() {
+    return m1.npcsAutoAction();
   }
 
   @GetMapping("/get-battleinfo")
@@ -138,15 +138,14 @@ public class WorldController {
   }
   
   @PostMapping("/update-battle")
-  public BattleInfo updateBattle(@RequestBody java.util.Map<String, Integer> requestBody) { 
+  public boolean updateBattle(@RequestBody java.util.Map<String, Integer> requestBody) { 
     // if (b1 == null) { return new BattleInfo(null, null, null, false, false); }
     int userChoice = requestBody.get("userChoice");
     b1.fight(userChoice);
     if (!b1.getBattleInfo().active()) {
-      m1.setBattle(false);
       m1.setTrainerMayMove(true);
     }
-    return b1.getBattleInfo(); 
+    return true; 
   }
 
   @GetMapping("/try-escape")
@@ -154,7 +153,7 @@ public class WorldController {
     // if (b1 == null) { return true; }
     boolean tmp = b1.tryEscape();
     if (tmp) {
-      m1.setBattle(false);
+      //m1.setBattle(false);
       m1.setTrainerMayMove(true);
     }
     return tmp;

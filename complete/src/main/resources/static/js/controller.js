@@ -60,28 +60,13 @@ initMap();
 // update npcs in map
 async function updateNpcsInMap() {
   try {
+    // do not if no map there
+    if (!document.getElementById("mapContainer")) { return; }
+
     const updateNpcsData = await fetchAsync("/update-npcs");
+    if (updateNpcsData) { interaction() }
 
-    if (updateNpcsData !== null) {
-      appendNpcInteraction();
-      appendDialogBox(updateNpcsData.npcAnswer);
-
-      if (updateNpcsData.possibleUserAnswers !== null) {
-        appendAnswerBtns(updateNpcsData.possibleUserAnswers);
-      }
-
-      if (updateNpcsData.battle) {
-        // wait 2 s
-        setTimeout(function () {
-          initBattle();
-        }, 2000);
-      }
-    } else {
-      // Handle the case when updateNpcsData is null
-      //console.warn("Update NPCs data is null");
-      //return; // Exit the function to prevent executing the next await
-    }
-
+    // update npc position in map always
     const getMapData = await fetchAsync("/get-map");
     moveNpcsInMap(getMapData.matrixString, getMapData.npcsPos);
   } catch (error) {
@@ -91,24 +76,26 @@ async function updateNpcsInMap() {
 }
 
 // apiMoving
-function apiMoving(direction) {
+async function apiMoving(direction) {
   // {direction} -> {"direction":"up"}
-  postAsync("/move", {direction})
-    .then(data => { 
-      if (data.trainerMayMove) { rmElementById("npcInteraction"); }
-      // render map only when map has changed, map rendering is expensive
-      if (!(JSON.stringify(currentMapName) === JSON.stringify(data.name))) {
-        renderMap(data);
-      }
-      // update trainer position in map always
-      updateTrainerInMap(data.matrixString, data.trainerPos, data.trainerDirection); 
-      currentTrainerPos = data.trainerPos;
-      scrollToTarget(data.trainerPos); 
+  const move = await postAsync("/move", {direction});
+  if (!move) { 
+    console.log("blocked");
+    //return; 
+  }
 
-    })
-      .catch(()=>{
-        ///Exception occured do something
-      });
+  const data = await fetchAsync("/get-map")
+  if (data.trainerMayMove) { rmElementById("npcInteraction"); }
+  // render map only when map has changed, map rendering is expensive
+  if (!(JSON.stringify(currentMapName) === JSON.stringify(data.name))) {
+    renderMap(data);
+  }
+  // update trainer position in map always
+  updateTrainerInMap(data.matrixString, data.trainerPos, data.trainerDirection); 
+  currentTrainerPos = data.trainerPos;
+  scrollToTarget(data.trainerPos); 
+
+  if (data.wildPoke !== null ) { console.log(data.wildPoke); }
 }
 
 // interaction with npc
@@ -159,7 +146,7 @@ function checkKey(e) {
     case 39: apiMoving("right"); break;
 
     // Enter key
-    case 13: interaction("bla"); break;
+    case 13: interaction(); break;
 
     default:
       // Handle other cases or do nothing

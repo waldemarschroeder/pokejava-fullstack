@@ -5,111 +5,118 @@ import com.pokejava.PokeJava.PokeInfo;
 public class Battle {
 
     private final NPC trainer;
-    private final NPC npc;
-    private int indexFightingTrainerPoke;
-    private int indexFightingNpcPoke;
+    private NPC npc;
+
+    private PokeJava trainerPoke;
+    private PokeJava npcPoke;
+    
     private String[][] text;
     private boolean trainerPokeStarts = true;
-    private boolean active;
+    private boolean active = true;
+    private boolean wildPoke = false;
 
-    public record BattleInfo(PokeInfo trainerPoke, PokeInfo npcPoke, String[][] text, boolean trainerPokeStarts, boolean active) {}
+    public record BattleInfo(PokeInfo trainerPoke, PokeInfo npcPoke, String[][] text, boolean trainerPokeStarts, boolean active, boolean wildPoke) {}
     public BattleInfo getBattleInfo() {
         return new BattleInfo(
-            this.trainer.getPokes()[indexFightingTrainerPoke].getPokeInfo(),
-            this.npc.getPokes()[indexFightingNpcPoke].getPokeInfo(),
+            trainerPoke.getPokeInfo(),
+            npcPoke.getPokeInfo(),
             this.text,
             this.trainerPokeStarts,
-            this.active
+            this.active,
+            this.wildPoke
         );
     }
 
+    // trainer vs. npc
     public Battle(NPC trainer, NPC npc) {
         this.trainer = trainer;
         this.npc = npc;
 
-        this.indexFightingTrainerPoke = findIndexFirstFightablePoke(this.trainer.getPokes());
-        this.indexFightingNpcPoke = findIndexFirstFightablePoke(this.npc.getPokes());
+        this.trainerPoke = findFirstFightablePoke(trainer.getPokes());
+        this.npcPoke = findFirstFightablePoke(npc.getPokes());
 
-        initializeBattleText();
-        this.active = true;
-    }
-
-    private void initializeBattleText() {
         this.text = new String[][] { 
             new String[] {
                 trainer.getName() + " fights against " + npc.getName(),
-                "Let's go " + trainer.getPokes()[indexFightingTrainerPoke].getSpecie()
+                "Let's go " + trainerPoke.getPokeInfo().specie()
             },
         };
     }
 
-    private int findIndexFirstFightablePoke(PokeJava[] pokes) {
-        for (int i = 0; i < pokes.length; i++) {
-            PokeJava poke = pokes[i];
-            if (poke.getIsHp() > 0) {
-                return i;
-            }
-        }
-        // Error
-        return 100;
+    // trainer vs. wildPoke
+    public Battle(NPC trainer, PokeJava wildPoke) {
+        this.wildPoke = true;
+        this.trainer = trainer;
+
+        this.trainerPoke = findFirstFightablePoke(trainer.getPokes());
+        this.npcPoke = wildPoke;
+
+        this.text = new String[][] { 
+            new String[] {
+                "A wild " + npcPoke.getPokeInfo().specie() + " has come!",
+                "Let's go " + trainerPoke.getPokeInfo().specie()
+            },
+        };
     }
 
-    public BattleInfo fight(int trainerChoice) {
+    private PokeJava findFirstFightablePoke(PokeJava[] pokes) {
+        for (PokeJava poke : pokes) {
+            if (poke.getPokeInfo().isHp() > 0) { return poke; }
+        }
+        // Error
+        return null;
+    }
+
+    public void fight(int trainerChoice) {
 
         // if not active stop
-        if (!this.active) { return new BattleInfo(null, null, text, trainerPokeStarts, active); }
-
-        PokeJava trainerPoke = trainer.getPokes()[indexFightingTrainerPoke];
-        PokeJava npcPoke = npc.getPokes()[indexFightingNpcPoke];
+        if (!this.active) { return; }
 
         int npcChoice = npcPoke.getIndexBestAttack(trainerPoke);
+
+        PokeInfo trainerPokeInfo = trainerPoke.getPokeInfo();
+        PokeInfo npcPokeInfo = npcPoke.getPokeInfo();
 
         String[] texts1 = null;
         String[] texts2 = null;
         String[] texts3 = null;
 
         // the faster poke will start
-        if (trainerPoke.getStats().speed() >= npcPoke.getStats().speed()) {
+        if (trainerPokeInfo.stats().speed() >= npcPokeInfo.stats().speed()) {
             this.trainerPokeStarts = true;
             texts1 = trainerPoke.attackPoke(trainerChoice, npcPoke);
-            if (npcPoke.getIsHp() > 0) { 
+            if (npcPokeInfo.isHp() > 0) { 
                 texts2 = npcPoke.attackPoke(npcChoice, trainerPoke);
             }
         } else {
             this.trainerPokeStarts = false;
             texts1 = npcPoke.attackPoke(npcChoice, trainerPoke);
-            if (trainerPoke.getIsHp() > 0) {
+            if (trainerPokeInfo.isHp() > 0) {
                 texts2 = trainerPoke.attackPoke(trainerChoice, npcPoke);
             }
         }
 
-        if (trainerPoke.getIsHp() == 0) {
-            int index = findIndexFirstFightablePoke(this.trainer.getPokes());
+        if (trainerPokeInfo.isHp() == 0) {
+            this.trainerPoke = findFirstFightablePoke(this.trainer.getPokes());
             // battle is over
-            if (index == 100) { 
+            if (trainerPoke == null) { 
                 this.active = false;
                 texts3 = new String[] { "You lost" };
-            } else {
-                // next poke
-                this.indexFightingTrainerPoke = index;
             }
         }
-        if (npcPoke.getIsHp() == 0) {
-            int index = findIndexFirstFightablePoke(this.npc.getPokes());
+        if (npcPokeInfo.isHp() == 0) {
+            if (!wildPoke) { this.npcPoke = findFirstFightablePoke(this.npc.getPokes()); }
+            else { npcPoke = null; }
             // battle is over
-            if (index == 100) { 
+            if (npcPoke == null) { 
                 this.active = false; 
                 texts3 = new String[] { "You won" };
-                npc.setdefeated(true);
-            } else {
-                // next poke
-                this.indexFightingNpcPoke = index;
+                if (!wildPoke) { npc.setdefeated(true); }
             }
         }
 
         this.text = new String[][] { texts1, texts2, texts3 };
 
-        return getBattleInfo();
     }
 
     public boolean tryEscape() {

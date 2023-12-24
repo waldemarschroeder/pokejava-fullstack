@@ -14,7 +14,7 @@ public class Route3TopNpc extends NPC {
     private int counter = 0;
     // Override
     @Override
-    public InteractionInfo autoAction(Map map) {
+    public boolean autoAction(Map map) {
 
         int maxCount = 16;
 
@@ -32,7 +32,7 @@ public class Route3TopNpc extends NPC {
             this.counter = 0;
         }
 
-        return null;
+        return false;
 
     }
 

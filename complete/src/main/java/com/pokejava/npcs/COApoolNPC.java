@@ -16,22 +16,21 @@ public class COApoolNPC extends NPC {
     private Position trainerPosAction2 = new Position(9, 49);
     // Override
     @Override
-    public void setTrainerSeen(Map map) {
+    public void setTrainerSeen(NPC trainer) {
         
         // get Position of trainer
-        Position trainerPos = map.getTrainer().getPos();
+        Position trainerPos = trainer.getPos();
 
         if (trainerContacted) {
             this.trainerSeen = false; 
         } else if (trainerPos.equals(trainerPosAction1) || trainerPos.equals(trainerPosAction2)) {
             this.trainerSeen = true;
-            map.setTrainerMayMove(false);
         }
     }
 
     // Override
     @Override
-    public InteractionInfo autoAction(Map map) {
+    public boolean autoAction(Map map) {
 
         // get target Position of trainer
         Position targetPos = map.getTrainer().getTargetPosition();
@@ -40,20 +39,20 @@ public class COApoolNPC extends NPC {
         if (trainerContacted && !p.equals(initPos)) { 
             // Find the way back
             findNextMove(map, this.p, initPos); 
-            return null;
+            return false;
         }
 
         if (trainerSeen && !trainerContacted) {
             if(this.p.equals(targetPos)) {
                 this.trainerContacted = true;
                 map.setTrainerMayMove(true);
-                return interacted(null, map.getTrainer());
+                return true;
             } else {
                 // Find the next move towards the trainer
                 findNextMove(map, this.p, targetPos);
             }
         }
-        return null;
+        return false;
 
     }
 
