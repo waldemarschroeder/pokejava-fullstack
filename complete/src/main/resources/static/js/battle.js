@@ -49,7 +49,7 @@ function appendBattlePokeInfo(poke, appendTo, isTrainerPoke) {
     // battlePokeInfo specie + lvl
     const battlePokeInfo = document.createElement('div');
     battlePokeInfo.id = "battlePokeInfo";
-    battlePokeInfo.textContent = poke.specie + "     Lvl. " + poke.lvl;
+    battlePokeInfo.textContent = poke.specie + " " + poke.gender[0] + "    Lvl. " + poke.lvl;
     appendTo.appendChild(battlePokeInfo);
 
     // dynamic green health bar
@@ -68,6 +68,13 @@ function appendBattlePokeInfo(poke, appendTo, isTrainerPoke) {
     if (isTrainerPoke) {
         // Set the text content with current HP and max HP
         battlePokeHpBarValue.textContent = "HP " + poke.isHp + " / " + poke.stats.maxHp;
+
+        // exp / expNextLvl
+        const battlePokeExp = document.createElement("div");
+        battlePokeExp.id = "battlePokeExp";
+        battlePokeInfo.appendChild(battlePokeExp);
+        battlePokeExp.textContent = "EXP " + poke.exp + " / " + poke.stats.expNextLvl
+
     }
 
 }
@@ -184,6 +191,7 @@ function appendEscapeBtn(appendEscBtnTo) {
                     newButton.remove();
                     back2Map();
                 }
+                else { console.log("Escape failed"); }
             })
                 .catch(()=>{
                     ///Exception occured do something

@@ -18,6 +18,7 @@ public class Normie extends PokeJava {
         };
     }
 
-    public Normie(int lvl) { super("Normie", "normal", lvl); }
+    // 50, 50 -> male, female
+    public Normie(int lvl) { super("Normie", "normal", new double[] {0.5, 0.5}, lvl); }
 
 }

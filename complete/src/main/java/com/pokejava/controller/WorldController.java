@@ -21,6 +21,7 @@ import com.pokejava.*;
 import com.pokejava.Battle.BattleInfo;
 import com.pokejava.Map.MapInfo;
 import com.pokejava.NPC.InteractionInfo;
+import com.pokejava.NPC.MoveInfo;
 import com.pokejava.PokeJava.PokeInfo;
 import com.pokejava.maps.*;
 import com.pokejava.npcs.Trainer;
@@ -43,8 +44,6 @@ public class WorldController {
   // Create an ArrayList to store maps
   List<Map> mapsList;
 
-  Battle b1;
-
   public WorldController() {
     // Initialize m1 and set the trainer within the constructor
     m1 = new Route1();
@@ -59,20 +58,32 @@ public class WorldController {
 
   // true if move sucessful, else false
   @PostMapping("/move")
-  public boolean move(@RequestBody java.util.Map<String, String> requestBody) {
+  public MoveInfo move(@RequestBody java.util.Map<String, String> requestBody) {
     String direction = requestBody.get("direction");
-    if (!t1.move(m1, direction)) { return false; };
-    Map newMap = MapInterfaceDB.nextMap(m1);
 
+    // do ONE move
+    MoveInfo firstMove = t1.move(m1, direction);
+    
+    // move blocked -> stop
+    if (!firstMove.success()) { return firstMove; };
+    
+    // move was successful, are we now on a new map?
+    Map newMap = MapInterfaceDB.nextMap(m1);
     if (newMap != null) {
+      
+      // does the new map already exists in the list?
       Map updatedMap = handleMapUpdate(newMap);
       if (updatedMap != null) {
         m1 = updatedMap;
       }
-      t1.move(m1, direction);
-    }
 
-    return true;
+      // do move again to not stay in the entry
+      return t1.move(m1, direction);
+    } 
+
+    // we are on the same map, return the one move before
+    else { return firstMove;}
+
   }
 
   private Map handleMapUpdate(Map newMap) {
@@ -80,6 +91,7 @@ public class WorldController {
             .filter(Objects::nonNull)
             .anyMatch(map -> Objects.equals(newMap.getInitName(), map.getInitName()));
 
+    // if map is not in the list, add it and return it, else return the existing map in the list
     if (!listHasMap) {
       mapsList.add(newMap);
       return newMap;
@@ -121,7 +133,7 @@ public class WorldController {
     InteractionInfo i1 = m1.npcInteraction(userAnswer); 
     // when user press enter anywhere
     if (i1 == null) { return null;}
-    if (i1.battle() != null) { b1 = i1.battle(); }
+    //if (i1.battle()) { b1 = m1.getMapInfo().battle(); }
     return i1;
   }
 
@@ -134,29 +146,21 @@ public class WorldController {
   @GetMapping("/get-battleinfo")
   public BattleInfo getBattle() { 
     // if (b1 == null) { return new BattleInfo(null, null, null, false, false); }
-    return b1.getBattleInfo(); 
+    return m1.getBattle().getBattleInfo(); 
   }
   
   @PostMapping("/update-battle")
   public boolean updateBattle(@RequestBody java.util.Map<String, Integer> requestBody) { 
     // if (b1 == null) { return new BattleInfo(null, null, null, false, false); }
     int userChoice = requestBody.get("userChoice");
-    b1.fight(userChoice);
-    if (!b1.getBattleInfo().active()) {
-      m1.setTrainerMayMove(true);
-    }
+    m1.getBattle().fight(userChoice);
     return true; 
   }
 
   @GetMapping("/try-escape")
   public boolean tryEscape() { 
     // if (b1 == null) { return true; }
-    boolean tmp = b1.tryEscape();
-    if (tmp) {
-      //m1.setBattle(false);
-      m1.setTrainerMayMove(true);
-    }
-    return tmp;
+    return m1.getBattle().tryEscape();
   }
   
 }

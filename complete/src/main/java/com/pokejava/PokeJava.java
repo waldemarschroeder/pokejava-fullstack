@@ -4,6 +4,30 @@ public class PokeJava {
     
     private String specie;
     private String type;
+    
+    private String gender;
+    // new double[] {0.5, 0.5} -> 50% m or f
+    private String getInitGender(double[] probsGender) {
+        // Check if the input array has exactly two elements
+        if (probsGender.length != 2) {
+            throw new IllegalArgumentException("The input array must have exactly two elements representing male and female probabilities.");
+        }
+
+        // Check if both probabilities are 0
+        if (probsGender[0] == 0 && probsGender[1] == 0) {
+            return "none";
+        }
+    
+        // Calculate a random value between 0 and 1
+        double randomValue = Math.random();
+    
+        // Determine the initial gender based on the probabilities
+        if (randomValue < probsGender[0]) {
+            return "male";
+        } else {
+            return "female";
+        }
+    }    
 
     protected int lvl;
     public void lvlUp() { 
@@ -24,24 +48,25 @@ public class PokeJava {
     public void incExp(int extraExp) { this.exp += extraExp; }
 
     protected PokeStats stats;
-    public void setStats() {}; // Override
+    protected void setStats() {}; // Override
 
     // max 4 Attacks
     protected PokeAttack[] attacks = new PokeAttack[4];
-    public PokeAttack[] initAttacks() { return null; } // Override
+    protected PokeAttack[] initAttacks() { return null; } // Override
 
     public record PokeStats (int maxHp, int atk, int def, int speed, int expNextLvl) {}
 
     public record PokeAttack(String name, String type, int power) {}
 
-    public record PokeInfo(String specie, String type, int lvl, int isHp, int exp, PokeStats stats, PokeAttack[] attacks) {}
+    public record PokeInfo(String specie, String type, String gender, int lvl, int isHp, int exp, PokeStats stats, PokeAttack[] attacks) {}
     public PokeInfo getPokeInfo() {
-        return new PokeInfo(this.specie, this.type, this.lvl, this.isHp, this.exp, this.stats, this.attacks);
+        return new PokeInfo(this.specie, this.type, this.gender, this.lvl, this.isHp, this.exp, this.stats, this.attacks);
     }
 
-    public PokeJava(String specie, String type, int lvl) {
+    public PokeJava(String specie, String type, double[] probsGender, int lvl) {
         this.specie = specie;
         this.type = type;
+        this.gender = getInitGender(probsGender);
         this.lvl = lvl;
         this.setStats();
         this.isHp = stats.maxHp();
@@ -76,7 +101,7 @@ public class PokeJava {
 
     }
 
-    public int[] getEffIntAndDamage(int attackChoice, PokeJava enemyPoke) {
+    private int[] getEffIntAndDamage(int attackChoice, PokeJava enemyPoke) {
         
         PokeAttack attack = attacks[attackChoice];
         PokeInfo enemyPokeInfo = enemyPoke.getPokeInfo();

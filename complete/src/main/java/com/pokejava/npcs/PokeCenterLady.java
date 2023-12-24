@@ -27,7 +27,7 @@ public class PokeCenterLady extends NPC {
                 break;
         }
 
-        return new InteractionInfo(npcAnswer, possibleUserAnswers, null);
+        return new InteractionInfo(npcAnswer, possibleUserAnswers, false);
 
     }
 

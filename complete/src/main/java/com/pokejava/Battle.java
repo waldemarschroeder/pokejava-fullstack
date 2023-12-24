@@ -17,19 +17,31 @@ public class Battle {
 
     public record BattleInfo(PokeInfo trainerPoke, PokeInfo npcPoke, String[][] text, boolean trainerPokeStarts, boolean active, boolean wildPoke) {}
     public BattleInfo getBattleInfo() {
-        return new BattleInfo(
-            trainerPoke.getPokeInfo(),
-            npcPoke.getPokeInfo(),
-            this.text,
-            this.trainerPokeStarts,
-            this.active,
-            this.wildPoke
-        );
+        if (active) {
+            return new BattleInfo(
+                trainerPoke.getPokeInfo(),
+                npcPoke.getPokeInfo(),
+                this.text,
+                this.trainerPokeStarts,
+                this.active,
+                this.wildPoke
+            );
+        } else {
+            return new BattleInfo(
+                null,
+                null,
+                this.text,
+                this.trainerPokeStarts,
+                this.active,
+                this.wildPoke
+            );
+        }
     }
 
     // trainer vs. npc
     public Battle(NPC trainer, NPC npc) {
         this.trainer = trainer;
+        trainer.setMayMove(false);
         this.npc = npc;
 
         this.trainerPoke = findFirstFightablePoke(trainer.getPokes());
@@ -47,6 +59,7 @@ public class Battle {
     public Battle(NPC trainer, PokeJava wildPoke) {
         this.wildPoke = true;
         this.trainer = trainer;
+        trainer.setMayMove(false);
 
         this.trainerPoke = findFirstFightablePoke(trainer.getPokes());
         this.npcPoke = wildPoke;
@@ -74,42 +87,42 @@ public class Battle {
 
         int npcChoice = npcPoke.getIndexBestAttack(trainerPoke);
 
-        PokeInfo trainerPokeInfo = trainerPoke.getPokeInfo();
-        PokeInfo npcPokeInfo = npcPoke.getPokeInfo();
+        //PokeInfo trainerPokeInfo = trainerPoke.getPokeInfo();
+        //PokeInfo npcPokeInfo = npcPoke.getPokeInfo();
 
         String[] texts1 = null;
         String[] texts2 = null;
         String[] texts3 = null;
 
         // the faster poke will start
-        if (trainerPokeInfo.stats().speed() >= npcPokeInfo.stats().speed()) {
+        if (trainerPoke.getPokeInfo().stats().speed() >= npcPoke.getPokeInfo().stats().speed()) {
             this.trainerPokeStarts = true;
             texts1 = trainerPoke.attackPoke(trainerChoice, npcPoke);
-            if (npcPokeInfo.isHp() > 0) { 
+            if (npcPoke.getPokeInfo().isHp() > 0) { 
                 texts2 = npcPoke.attackPoke(npcChoice, trainerPoke);
             }
         } else {
             this.trainerPokeStarts = false;
             texts1 = npcPoke.attackPoke(npcChoice, trainerPoke);
-            if (trainerPokeInfo.isHp() > 0) {
+            if (trainerPoke.getPokeInfo().isHp() > 0) {
                 texts2 = trainerPoke.attackPoke(trainerChoice, npcPoke);
             }
         }
 
-        if (trainerPokeInfo.isHp() == 0) {
+        if (trainerPoke.getPokeInfo().isHp() == 0) {
             this.trainerPoke = findFirstFightablePoke(this.trainer.getPokes());
             // battle is over
             if (trainerPoke == null) { 
-                this.active = false;
+                battleEnded();
                 texts3 = new String[] { "You lost" };
             }
         }
-        if (npcPokeInfo.isHp() == 0) {
+        if (npcPoke.getPokeInfo().isHp() == 0) {
             if (!wildPoke) { this.npcPoke = findFirstFightablePoke(this.npc.getPokes()); }
             else { npcPoke = null; }
             // battle is over
             if (npcPoke == null) { 
-                this.active = false; 
+                battleEnded();
                 texts3 = new String[] { "You won" };
                 if (!wildPoke) { npc.setdefeated(true); }
             }
@@ -120,8 +133,17 @@ public class Battle {
     }
 
     public boolean tryEscape() {
+        if (wildPoke) {
+            battleEnded();
+            return true;
+        }
+        // trainer cannot escape npc battle
+        else { return false; }
+    }
+
+    private void battleEnded() {
         this.active = false;
-        return true;
+        trainer.setMayMove(true);
     }
 }
 

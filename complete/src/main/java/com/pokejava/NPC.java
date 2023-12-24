@@ -39,35 +39,52 @@ public class NPC {
     public boolean getDefeated() { return defeated; }
     public void setdefeated(boolean defeated) { this.defeated = defeated; }
 
-    protected boolean trainerContacted = false;
+    // the default npc doesnt want to interact and is blind
+    protected boolean wantsToInteract = false;
+    public boolean getWantsToInteract() { return this.wantsToInteract; }
+
     protected boolean trainerSeen = false;
     public boolean getTrainerSeen() { return this.trainerSeen; }
-    public void setTrainerSeen(NPC trainer) {}; // Override
+    public void setTrainerSeen(Position trainerPos) {}; // Override
 
-    public record InteractionInfo(String npcAnswer, String[] possibleUserAnswers, Battle battle) {};
+    protected boolean mayMove = true;
+    public boolean getMayMove() { return this.mayMove; }
+    public void setMayMove(boolean mayMove) { this.mayMove = mayMove; }
+
+    public record InteractionInfo(String npcAnswer, String[] possibleUserAnswers, boolean battle) {};
     
     // Override
-    public InteractionInfo interacted(String userAnswer, NPC trainer) { return new InteractionInfo("hi", null, null); }
+    public InteractionInfo interacted(String userAnswer, NPC trainer) { return new InteractionInfo("hi", null, false); }
 
-    //Override
-    public boolean autoAction(Map map) { return false; }
+    public boolean autoAction(Map map) { return false; } // Override
 
-    public boolean move(Map map, String direction) {
+    public record MoveInfo(boolean success, boolean npcWantInteraction, boolean wildPokeAttacked) {}
+
+    public MoveInfo move(Map map, String direction) {
 
         // update direction, always if it's a npc, maybe not if it's a trainer
-        if (map.getTrainerMayMove() || this.getClass() != Trainer.class) { this.direction = direction; }
-        else { return false; }
+        if (mayMove || this.getClass() != Trainer.class) { this.direction = direction; }
 
+        // move blocked, stop here
+        else { return new MoveInfo(false, false, false); }
+
+        boolean success = false;
+        boolean npcWantInteraction = false;
+        boolean wildPokeAttacked = false;
         Position target = getTargetPosition();
         if (map.mayMove(target)) {
             map.moveObj(this.p, target);
             this.p = target;
+            success = true;
+
+            // the both other bools are only relevant for the trainer
             if (this.getClass() == Trainer.class) { 
-                map.npcsTrainerSeen(); // true or false unhandled
-                map.wildPokeAttacked(); // true or false unhandled
+                npcWantInteraction = map.npcWantInteraction();
+                wildPokeAttacked = map.wildPokeAttacked();
             }
-            return true;
-        } else { return false; }
+            
+        }
+        return new MoveInfo(success, npcWantInteraction, wildPokeAttacked);
     }
 
     public Position getTargetPosition() { 
@@ -100,7 +117,7 @@ public class NPC {
         if (Math.abs(dx) > Math.abs(dy)) {
             // Try move horizontally first
             direction = (dx > 0) ? "right" : "left";
-            if (move(map, direction)) {
+            if (move(map, direction).success()) {
                 return; // Exit the method if the horizontal move is successful
             }
             // If not successful, try move vertically
@@ -109,7 +126,7 @@ public class NPC {
         } else {
             // Try move vertically first
             direction = (dy > 0) ? "down" : "up";
-            if (move(map, direction)) {
+            if (move(map, direction).success()) {
                 return; // Exit the method if the vertical move is successful
             }
             // If not successful, try move horizontally

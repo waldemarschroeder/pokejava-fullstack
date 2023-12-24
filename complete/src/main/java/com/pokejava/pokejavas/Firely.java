@@ -16,6 +16,7 @@ public class Firely extends PokeJava {
         };
     }
 
-    public Firely(int lvl) { super("Firely", "fire", lvl); }
+    // always male
+    public Firely(int lvl) { super("Firely", "fire", new double[] {1, 0}, lvl); }
 
 }

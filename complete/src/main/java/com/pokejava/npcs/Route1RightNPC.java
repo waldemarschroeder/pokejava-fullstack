@@ -8,17 +8,17 @@ public class Route1RightNPC extends NPC {
     // Override
     @Override
     public InteractionInfo interacted(String userAnswer, NPC trainer) { 
-        Battle battle = null;
+        boolean battle = false;
         String npcAnswer = "";
         String[] possibleUserAnswers = null;
         
         if (!defeated) {
             switch(userAnswer) {
                 // second answer
-                case "yes": npcAnswer = "Yeah, let's go!"; battle = new Battle(trainer, this); break;
+                case "yes": npcAnswer = "Yeah, let's go!"; battle = true; break;
 
                 // second answer
-                case "no": npcAnswer = "I don't care, we will fight nevertheless!"; battle = new Battle(trainer, this); break;
+                case "no": npcAnswer = "I don't care, we will fight nevertheless!"; battle = true; break;
                 
                 // first answer
                 default: 
@@ -29,10 +29,10 @@ public class Route1RightNPC extends NPC {
         } else {
             switch(userAnswer) {
                 // second answer
-                case "yes": npcAnswer = "I will win this time!"; battle = new Battle(trainer, this); healPokes(); break;
+                case "yes": npcAnswer = "I will win this time!"; battle = true; healPokes(); break;
 
                 // second answer
-                case "no": npcAnswer = "Yeah, you know, that you will lose!"; battle = null; break;
+                case "no": npcAnswer = "Yeah, you know, that you will lose!"; battle = false; break;
                 
                 // first answer
                 default: 

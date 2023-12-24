@@ -64,7 +64,7 @@ async function updateNpcsInMap() {
     if (!document.getElementById("mapContainer")) { return; }
 
     const updateNpcsData = await fetchAsync("/update-npcs");
-    if (updateNpcsData) { interaction() }
+    if (updateNpcsData) { interaction(); }
 
     // update npc position in map always
     const getMapData = await fetchAsync("/get-map");
@@ -78,9 +78,9 @@ async function updateNpcsInMap() {
 // apiMoving
 async function apiMoving(direction) {
   // {direction} -> {"direction":"up"}
-  const move = await postAsync("/move", {direction});
-  if (!move) { 
-    console.log("blocked");
+  const moveData = await postAsync("/move", {direction});
+  if (!moveData.success) { 
+    console.log("move blocked");
     //return; 
   }
 
@@ -95,7 +95,13 @@ async function apiMoving(direction) {
   currentTrainerPos = data.trainerPos;
   scrollToTarget(data.trainerPos); 
 
-  if (data.wildPoke !== null ) { console.log(data.wildPoke); }
+  // wild poke attacked, render map before
+  if (moveData.wildPokeAttacked) {
+    // wait 2 s
+    setTimeout(function() { initBattle(); }, 1000); 
+    return;
+  }
+
 }
 
 // interaction with npc

@@ -13,12 +13,13 @@ public class Map {
     public NPC getTrainer() { return this.trainer; }
     public void setTrainer(NPC trainer) { this.trainer = trainer; }
 
-    protected boolean trainerMayMove = true;
-    public boolean getTrainerMayMove() { return this.trainerMayMove; }
-    public void setTrainerMayMove(boolean trainerMayMove) { this.trainerMayMove = trainerMayMove; }
+    //protected boolean trainerMayMove = true;
+    //public boolean getTrainerMayMove() { return this.trainerMayMove; }
+    // only the map should decide if the trainer may move
+    //public void setTrainerMayMove(boolean trainerMayMove) { this.trainerMayMove = trainerMayMove; }
 
-    protected PokeJava wildPoke;
-    //public void setBattle(boolean battle) { this.battle = battle; }
+    protected Battle battle;
+    public Battle getBattle() { return this.battle; }
 
     protected PokeOccur[] pokesOccur() { return null; } // Override
 
@@ -27,9 +28,9 @@ public class Map {
 
     private Field[][] matrixField;
 
-    public record MapInfo(String name, String[][] matrixString, Position trainerPos, String trainerDirection, boolean trainerMayMove, Position[] npcsPos, PokeJava wildPoke) {}
+    public record MapInfo(String name, String[][] matrixString, Position trainerPos, String trainerDirection, boolean trainerMayMove, Position[] npcsPos) {}
     public MapInfo getMapInfo() {
-        return new MapInfo(this.name, this.matrixString, this.trainer.getPos(), this.trainer.getDirection(), this.trainerMayMove, this.getNpcsPos(), this.wildPoke);
+        return new MapInfo(this.name, this.matrixString, trainer.getPos(), trainer.getDirection(), trainer.getMayMove(), this.getNpcsPos());
     }
 
     private NPC[] npcs;
@@ -122,14 +123,12 @@ public class Map {
         for (NPC npc : npcs) {
             if (target.equals(npc.getPos())) { 
                 InteractionInfo activeNpc = npc.interacted(userAnswer, trainer);
-                if (activeNpc.possibleUserAnswers() != null) { this.trainerMayMove = false; }
-                else if (activeNpc.battle() != null) { 
-                    this.trainerMayMove = false; 
-                    //this.battle = true;
-                }
-                else {
-                    this.trainerMayMove = true; 
-                    //this.battle = false;
+                
+                // the npc asked a question, dont run away trainer
+                if (activeNpc.possibleUserAnswers() != null) { trainer.setMayMove(false); }
+                else { trainer.setMayMove(true); }
+                if (activeNpc.battle()) { 
+                    this.battle = new Battle(trainer, npc);
                 }
                 return activeNpc; 
             }
@@ -140,12 +139,19 @@ public class Map {
 
     public boolean wildPokeAttacked() {
         Position trainerPos = this.trainer.getPos();
-        this.wildPoke = this.matrixField[trainerPos.y()][trainerPos.x()].getWildPoke();
-        if (wildPoke != null) { return true; }
-        else { return false; }
+        PokeJava wildPoke = this.matrixField[trainerPos.y()][trainerPos.x()].getWildPoke();
+        if (wildPoke != null && wildPoke.getPokeInfo().isHp() > 0) { 
+            this.battle = new Battle(trainer, wildPoke);
+            return true; 
+        }
+        else { 
+            //this.battle = null;
+            return false;
+        }
     }
 
-    // true if one npc wants to interact
+    // true when the trainer should asked for interaction
+    // function is called periodically after some time
     public boolean npcsAutoAction() {
         // activate autoAction from every npc 
         for (NPC npc : npcs) { 
@@ -154,16 +160,20 @@ public class Map {
         return false;
     }
 
-    // true if one npc saw the trainer
-    public boolean npcsTrainerSeen() {
+    // true if one npc saw the trainer and wants to interact
+    // function is called, everytime when the trainer moves
+    public boolean npcWantInteraction() {
         for (NPC npc : npcs) { 
-            npc.setTrainerSeen(trainer); 
-            if (npc.getTrainerSeen()) {
-                setTrainerMayMove(false);
+            npc.setTrainerSeen(trainer.getPos()); 
+            if (npc.getWantsToInteract() && npc.getTrainerSeen()) {
+                trainer.setMayMove(false);
                 npc.setDirectionToNpc(trainer);
                 return true;
             }
         }
+
+        // no npc wants something from the trainer
+        trainer.setMayMove(true);
         return false;
     }
 

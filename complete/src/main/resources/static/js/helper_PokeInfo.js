@@ -9,7 +9,7 @@ function appendPokeStats(poke, appendTo) {
     // Create a table
     const table = document.createElement('table');
     
-    const headerColumn = ["Specie", "Type", "Level", "HP", "Attack", "Defence", "Speed", "EXP"]
+    const headerColumn = ["Specie", "Type", "Gender", "Level", "HP", "Attack", "Defence", "Speed", "EXP"]
     for (let j = 0; j < headerColumn.length; j++) {
         const row = table.insertRow();
         const property = row.insertCell();
@@ -17,15 +17,16 @@ function appendPokeStats(poke, appendTo) {
         property.textContent = headerColumn[j];
 
         const cell = row.insertCell();
-        switch (j) {
+        switch(j) {
             case 0: cell.textContent = poke.specie; break;
             case 1: cell.textContent = poke.type; break;
-            case 2: cell.textContent = poke.lvl; break;
-            case 3: cell.textContent = poke.isHp + " / " + poke.stats.maxHp; break;
-            case 4: cell.textContent = poke.stats.atk; break;
-            case 5: cell.textContent = poke.stats.def; break;
-            case 6: cell.textContent = poke.stats.speed; break;
-            case 7: cell.textContent = poke.exp + " / " + poke.stats.expNextLvl; break;
+            case 2: cell.textContent = poke.gender; break;
+            case 3: cell.textContent = poke.lvl; break;
+            case 4: cell.textContent = poke.isHp + " / " + poke.stats.maxHp; break;
+            case 5: cell.textContent = poke.stats.atk; break;
+            case 6: cell.textContent = poke.stats.def; break;
+            case 7: cell.textContent = poke.stats.speed; break;
+            case 8: cell.textContent = poke.exp + " / " + poke.stats.expNextLvl; break;
             default:
                 // Handle other cases or do nothing
                 cell.textContent = poke.lvl; break;

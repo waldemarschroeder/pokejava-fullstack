@@ -7,7 +7,7 @@ public class Route3TopNpc extends NPC {
     // Override
     @Override
     public InteractionInfo interacted(String userAnswer, NPC trainer) { return new InteractionInfo("I am John.",
-     null, null); }
+     null, false); }
 
     public Route3TopNpc(Position p) { super(p); }
 
@@ -20,11 +20,11 @@ public class Route3TopNpc extends NPC {
 
         // Move down 8 times
         if (counter < maxCount / 2) {
-            if (move(map, "down")) { this.counter++; }
+            if (move(map, "down").success()) { this.counter++; }
         }
         // Move up back
         else if (counter >= maxCount / 2 && counter < maxCount) {
-            if (move(map, "up")) { this.counter++; }
+            if (move(map, "up").success()) { this.counter++; }
         }
 
         // Reset the counter

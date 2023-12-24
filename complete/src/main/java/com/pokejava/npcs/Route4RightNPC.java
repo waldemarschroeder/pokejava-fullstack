@@ -9,26 +9,25 @@ public class Route4RightNPC extends NPC {
     @Override
     public InteractionInfo interacted(String userAnswer, NPC trainer) { 
         if (!defeated) {
-            return new InteractionInfo("I saw you and now we will battle.", null, new Battle(trainer, this)); 
+            return new InteractionInfo("I saw you and now we will battle.", null, true); 
         } else {
-            return new InteractionInfo("Leave me alone.", null, null); 
+            return new InteractionInfo("Leave me alone.", null, false); 
         }
     }
 
-    public Route4RightNPC(Position p) { super("David", p, new PokeJava[]{ new Firely(4),}); }
+    public Route4RightNPC(Position p) { 
+        super("David", p, new PokeJava[]{ new Firely(4),}); 
+        this.wantsToInteract = true;
+    }
     
     // Override
     @Override
-    public void setTrainerSeen(NPC trainer) {
-        
-        // get Position of trainer
-        Position trainerPos = trainer.getPos();
+    public void setTrainerSeen(Position trainerPos) {
 
-        if (trainerContacted) {
-            this.trainerSeen = false; 
-        } else if (this.p.x() == trainerPos.x()) {
+        if (this.p.x() == trainerPos.x()) {
             this.trainerSeen = true;
         }
+
     }
 
     // Override
@@ -41,20 +40,15 @@ public class Route4RightNPC extends NPC {
         // only one npc answer
         if (defeated && !p.equals(initPos)) { 
             // Find the way back
-            findNextMove(map, this.p, initPos); 
+            findNextMove(map, this.p, initPos);
+            // only wants to interact if not defeated
+            this.wantsToInteract =  false;
             return false;
         }
 
-        // if npc is defeated, let the trainer go
-        // why is the line not nes. ?
-        //if (defeated) { map.setTrainerMayMove(true); }
-
-        if (trainerSeen && !trainerContacted) {
-            if(p.equals(targetPos)) {
-                this.trainerContacted = true;
-                return true;
-            }
-            findNextMove(map, p, targetPos);
+        if (trainerSeen && wantsToInteract) {
+            if (p.equals(targetPos)) { return true; }
+            else { findNextMove(map, p, targetPos); }
         }
         return false;
 

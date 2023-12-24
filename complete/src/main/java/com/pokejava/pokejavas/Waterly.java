@@ -16,6 +16,7 @@ public class Waterly extends PokeJava {
         };
     }
 
-    public Waterly(int lvl) { super("Waterly", "water", lvl); }
+    // without gender
+    public Waterly(int lvl) { super("Waterly", "water", new double[] {0, 0}, lvl); }
 
 }

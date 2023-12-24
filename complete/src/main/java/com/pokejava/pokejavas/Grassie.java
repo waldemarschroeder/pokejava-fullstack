@@ -16,6 +16,7 @@ public class Grassie extends PokeJava {
         };
     }
 
-    public Grassie(int lvl) { super("Grassie", "grass", lvl); }
+    // always female
+    public Grassie(int lvl) { super("Grassie", "grass", new double[] {0, 1}, lvl); }
 
 }
