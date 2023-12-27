@@ -327,7 +327,7 @@ p {
 
 #battlePokeInfo {
   white-space: pre-wrap;
-  border: 3px solid black;
+  border: 2px solid black;
   padding: 4px;
   row-gap: 5px;
   display: flex;
@@ -341,6 +341,43 @@ p {
   flex-direction: row;
   column-gap: 20px;
   align-items: flex-start; /* Align items to the baseline */
+}
+
+.hpContainer {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: row;
+  column-gap: 5px;
+}
+
+.expContainer {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: row;
+  column-gap: 5px;
+  font-size: 8px;
+}
+
+#battlePokeHpBar {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  min-height: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  border: #4caf50 2px solid;
+}
+
+#battlePokeExpBar {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  height: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  border: rgb(61, 187, 255) 2px solid;
 }
 
 #escapeBtn {

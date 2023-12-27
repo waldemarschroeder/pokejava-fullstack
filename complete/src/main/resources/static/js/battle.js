@@ -46,34 +46,44 @@ function appendBattlePokeInfo(poke, appendTo, isTrainerPoke) {
     // only one battlePokeInfo, always updating
     // rmElementById("battlePokeInfo");
 
-    // battlePokeInfo specie + lvl
+    // battlePokeInfo specie + gender + lvl
     const battlePokeInfo = document.createElement('div');
     battlePokeInfo.id = "battlePokeInfo";
     battlePokeInfo.textContent = poke.specie + " " + poke.gender[0] + "    Lvl. " + poke.lvl;
     appendTo.appendChild(battlePokeInfo);
 
+    // container for "HP" + health bar
+    const pokeHp = document.createElement('div');
+    pokeHp.className = "hpContainer";
+    pokeHp.id = "batPokeHp";
+    pokeHp.textContent = "HP"
+    battlePokeInfo.appendChild(pokeHp);
+
     // dynamic green health bar
     const battlePokeHpBar = document.createElement('div');
     battlePokeHpBar.id = "battlePokeHpBar";
-    battlePokeHpBar.style.height = "10px"; // Set the height of the health bar
     battlePokeHpBar.style.background = "linear-gradient(to right, #4caf50 " + ((poke.isHp / poke.stats.maxHp) * 100) + "%, transparent " + ((poke.isHp / poke.stats.maxHp) * 100) + "%)";
-    battlePokeInfo.appendChild(battlePokeHpBar);
-
-    // Create a child element for the actual health bar value
-    // isHp / maxHp
-    const battlePokeHpBarValue = document.createElement("div");
-    battlePokeHpBarValue.id = "battlePokeHpBarValue";
-    battlePokeInfo.appendChild(battlePokeHpBarValue);
+    if (!isTrainerPoke) {
+        // Make text content transparent
+        battlePokeHpBar.style.color = "transparent";
+    }
+    battlePokeHpBar.textContent = poke.isHp + " / " + poke.stats.maxHp;
+    pokeHp.appendChild(battlePokeHpBar);
 
     if (isTrainerPoke) {
-        // Set the text content with current HP and max HP
-        battlePokeHpBarValue.textContent = "HP " + poke.isHp + " / " + poke.stats.maxHp;
 
         // exp / expNextLvl
-        const battlePokeExp = document.createElement("div");
-        battlePokeExp.id = "battlePokeExp";
-        battlePokeInfo.appendChild(battlePokeExp);
-        battlePokeExp.textContent = "EXP " + poke.exp + " / " + poke.stats.expNextLvl
+        const pokeExp = document.createElement("div");
+        pokeExp.className = "expContainer";
+        pokeExp.id = "battlePokeExp";
+        battlePokeInfo.appendChild(pokeExp);
+        pokeExp.textContent = "EXP";
+
+        // dynamic blue exp bar
+        const battlePokeExpBar = document.createElement('div');
+        battlePokeExpBar.id = "battlePokeExpBar";
+        battlePokeExpBar.style.background = "linear-gradient(to right, rgb(61, 187, 255) " + ((poke.exp / poke.stats.expNextLvl) * 100) + "%, transparent " + ((poke.exp / poke.stats.expNextLvl) * 100) + "%)";
+        pokeExp.appendChild(battlePokeExpBar);
 
     }
 
