@@ -7,7 +7,7 @@ public class Route1RightNPC extends NPC {
 
     // Override
     @Override
-    public InteractionInfo interacted(String userAnswer, NPC trainer) { 
+    public InteractionInfo interacted(String userAnswer, Map map) { 
         boolean battle = false;
         String npcAnswer = "";
         String[] possibleUserAnswers = null;

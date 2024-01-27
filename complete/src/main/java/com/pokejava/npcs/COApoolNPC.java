@@ -6,7 +6,7 @@ public class COApoolNPC extends NPC {
 
     // Override
     @Override
-    public InteractionInfo interacted(String userAnswer, NPC trainer) { 
+    public InteractionInfo interacted(String userAnswer, Map map) { 
         return new InteractionInfo("Welcome to the best City: City of Azure.", null, false); 
     }
 

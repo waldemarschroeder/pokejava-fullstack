@@ -6,7 +6,7 @@ public class PokeCenterLady extends NPC {
 
     // Override
     @Override
-    public InteractionInfo interacted(String userAnswer, NPC trainer) { 
+    public InteractionInfo interacted(String userAnswer, Map map) { 
         String npcAnswer = "";
         String[] possibleUserAnswers = null;
         
@@ -14,7 +14,7 @@ public class PokeCenterLady extends NPC {
             // second answer
             case "yes": 
                 npcAnswer = "Ok, your PokeJavas are now healed."; 
-                trainer.healPokes();
+                map.getTrainer().healPokes();
                 break;
 
             // second answer

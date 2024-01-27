@@ -46,7 +46,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             ///Exception occured do something
                     });
                     break;
-                case "Badges": alert("You clicked: " + this.textContent); break;
+                case "Badges": 
+                    getBadges();
+                    break;
                 case "Pokedex": alert("You clicked: " + this.textContent); break;
                 case "Bag": alert("You clicked: " + this.textContent); break;
                 case "Map": alert("You clicked: " + this.textContent); break;

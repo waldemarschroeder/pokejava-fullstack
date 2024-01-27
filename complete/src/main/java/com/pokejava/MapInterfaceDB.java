@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.pokejava.maps.*;
+import com.pokejava.npcs.Trainer;
 
 public record MapInterfaceDB(MapInterface m1, MapInterface m2) {
 
@@ -98,7 +99,7 @@ public record MapInterfaceDB(MapInterface m1, MapInterface m2) {
     // the super code from chat gpt
     public static Map nextMap(Map initMap) {
         String mapName = initMap.getInitName();
-        NPC trainer = initMap.getTrainer();
+        Trainer trainer = initMap.getTrainer();
         Position p = trainer.getPos();
 
         for (MapInterfaceDB DB : DBs) {
@@ -143,7 +144,7 @@ public record MapInterfaceDB(MapInterface m1, MapInterface m2) {
 
     }
 
-    private static Map createInstance(String mapName, NPC trainer) {
+    private static Map createInstance(String mapName, Trainer trainer) {
         Class<?> clazz = classMapping.get(mapName);
         if (clazz != null) {
             try {

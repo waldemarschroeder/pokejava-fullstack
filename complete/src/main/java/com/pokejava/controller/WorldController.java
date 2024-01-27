@@ -34,7 +34,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class WorldController {
     
   PokeJava[] initPokes = new PokeJava[]{
-    new Normie(5),
+    new Normie(20),
     new Firely(5),
     new Waterly(5),
     new Grassie(5),
@@ -75,6 +75,7 @@ public class WorldController {
       Map updatedMap = handleMapUpdate(newMap);
       if (updatedMap != null) {
         m1 = updatedMap;
+        m1.shuffleWildPoke(); // trainer was already on this map, shuffle wild poke
       }
 
       // do move again to not stay in the entry
@@ -161,6 +162,11 @@ public class WorldController {
   public boolean tryEscape() { 
     // if (b1 == null) { return true; }
     return m1.getBattle().tryEscape();
+  }
+
+  @GetMapping("/get-badges")
+  public List<String> getBadges() { 
+    return m1.getTrainer().getBadges(); 
   }
   
 }

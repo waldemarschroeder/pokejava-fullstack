@@ -7,7 +7,7 @@ public class Route4RightNPC extends NPC {
 
     // Override
     @Override
-    public InteractionInfo interacted(String userAnswer, NPC trainer) { 
+    public InteractionInfo interacted(String userAnswer, Map map) { 
         if (!defeated) {
             return new InteractionInfo("I saw you and now we will battle.", null, true); 
         } else {

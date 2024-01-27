@@ -1,6 +1,7 @@
 package com.pokejava.maps;
 
 import com.pokejava.*;
+import com.pokejava.npcs.*;
 
 public class GymOfFire extends Map {
 
@@ -27,9 +28,9 @@ public class GymOfFire extends Map {
     @Override
     public NPC[] getInitNpcs() {
         return new NPC[] { 
-            new NPC(new Position(2, 4)), 
-            new NPC(new Position(4, 5)), 
-            new NPC(new Position(6, 3)), 
+            new GymOfFireLeader(new Position(2, 4)), 
+            new GymOfFireSec(new Position(4, 5)), 
+            new GymOfFireFirst(new Position(6, 3)), 
         };
     }
     

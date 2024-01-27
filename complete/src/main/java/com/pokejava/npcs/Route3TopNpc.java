@@ -6,7 +6,7 @@ public class Route3TopNpc extends NPC {
 
     // Override
     @Override
-    public InteractionInfo interacted(String userAnswer, NPC trainer) { return new InteractionInfo("I am John.",
+    public InteractionInfo interacted(String userAnswer, Map map) { return new InteractionInfo("I am John.",
      null, false); }
 
     public Route3TopNpc(Position p) { super(p); }

@@ -54,7 +54,7 @@ public class NPC {
     public record InteractionInfo(String npcAnswer, String[] possibleUserAnswers, boolean battle) {};
     
     // Override
-    public InteractionInfo interacted(String userAnswer, NPC trainer) { return new InteractionInfo("hi", null, false); }
+    public InteractionInfo interacted(String userAnswer, Map map) { return new InteractionInfo("hi", null, false); }
 
     public boolean autoAction(Map map) { return false; } // Override
 

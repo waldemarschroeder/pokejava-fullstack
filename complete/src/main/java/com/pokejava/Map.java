@@ -3,15 +3,16 @@ package com.pokejava;
 import com.pokejava.Field.PokeOccur;
 import com.pokejava.MapInterfaceDB.MapInterface;
 import com.pokejava.NPC.InteractionInfo;
+import com.pokejava.npcs.Trainer;
 
 public class Map {
 
     private String name;
     public String getInitName() { return null; } // Override
 
-    private NPC trainer;
-    public NPC getTrainer() { return this.trainer; }
-    public void setTrainer(NPC trainer) { this.trainer = trainer; }
+    private Trainer trainer;
+    public Trainer getTrainer() { return this.trainer; }
+    public void setTrainer(Trainer trainer) { this.trainer = trainer; }
 
     //protected boolean trainerMayMove = true;
     //public boolean getTrainerMayMove() { return this.trainerMayMove; }
@@ -43,6 +44,12 @@ public class Map {
             npcPositions[i] = npcPosition;
         }
         return npcPositions;
+    }
+    public NPC getNpc(Class<? extends NPC> npcClass){
+        for(NPC npc : npcs) {
+            if (npc.getClass().equals(npcClass)) { return npc; }
+        }
+        return null;
     }
 
     private static int findLongestArrayLength(String[][] matrix) {
@@ -98,6 +105,14 @@ public class Map {
 
     }
 
+    public void shuffleWildPoke() {
+        for (int i = 0; i < this.matrixString.length; i++) {
+            for (int j = 0; j < this.matrixString[i].length; j++) {
+                this.matrixField[i][j].randomWildPoke(this.pokesOccur());
+            }
+        }
+    }
+
     public void fieldSetIsAccessable(Position p, boolean isAccessable) {
         this.matrixField[p.y()][p.x()].setIsAccessable(isAccessable);
     }
@@ -122,7 +137,7 @@ public class Map {
 
         for (NPC npc : npcs) {
             if (target.equals(npc.getPos())) { 
-                InteractionInfo activeNpc = npc.interacted(userAnswer, trainer);
+                InteractionInfo activeNpc = npc.interacted(userAnswer, this);
                 
                 // the npc asked a question, dont run away trainer
                 if (activeNpc.possibleUserAnswers() != null) { trainer.setMayMove(false); }
