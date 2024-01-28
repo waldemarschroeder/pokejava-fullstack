@@ -15,4 +15,6 @@ But the game is playable, the main functions are working. <br />
 Earlier, I asked StackOverFlow for solutions, now I am asking ChatGPT. <br />
 
 ![Interaction with a NPC on Route 1](complete/src/main/resources/static/images/READMEimage1.png)
-![Battle](complete/src/main/resources/static/images/READMEimage2.png)
+![Battle](complete/src/main/resources/static/images/READMEimg4.png)
+![PokeJava](complete/src/main/resources/static/images/READMEimg3.png)
+![Badges](complete/src/main/resources/static/images/READMEimg5.png)

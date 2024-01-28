@@ -118,6 +118,7 @@ public class Battle {
             }
         }
         if (npcPoke.getPokeInfo().isHp() == 0) {
+            trainerPoke.incExp(4*npcPoke.getPokeInfo().lvl());
             if (!wildPoke) { this.npcPoke = findFirstFightablePoke(this.npc.getPokes()); }
             else { npcPoke = null; }
             // battle is over

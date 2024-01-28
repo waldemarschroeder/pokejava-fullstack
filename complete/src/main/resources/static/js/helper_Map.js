@@ -1,6 +1,5 @@
 // constants;
 const appendMapNameTo = document.getElementById("menuContainer");
-//const appendMapContainerTo = document.getElementById("content");
 
 // helper function
 function rmElementById(id) {

@@ -30,14 +30,6 @@ public class PokeJava {
     }    
 
     protected int lvl;
-    public void lvlUp() { 
-        if (this.exp >= this.stats.expNextLvl()) {
-            this.exp -= this.stats.expNextLvl();
-            this.lvl++; 
-            this.setStats();
-
-        }
-    }
 
     private int isHp;
     public void setIsHp(int isHp) { this.isHp = isHp; }
@@ -45,7 +37,15 @@ public class PokeJava {
     public void recHp() { this.isHp = this.stats.maxHp(); }
 
     private int exp;
-    public void incExp(int extraExp) { this.exp += extraExp; }
+    public void incExp(int extraExp) { 
+        this.exp += extraExp; 
+        if (this.exp >= this.stats.expNextLvl()) {
+            this.exp -= this.stats.expNextLvl();
+            this.lvl++; 
+            this.setStats();
+
+        }
+    }
 
     protected PokeStats stats;
     protected void setStats() {}; // Override

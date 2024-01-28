@@ -165,8 +165,8 @@ public class WorldController {
   }
 
   @GetMapping("/get-badges")
-  public List<String> getBadges() { 
-    return m1.getTrainer().getBadges(); 
+  public int getNumBadges() { 
+    return m1.getTrainer().getNumBadges(); 
   }
   
 }

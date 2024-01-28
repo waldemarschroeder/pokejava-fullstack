@@ -16,7 +16,8 @@ public class GymOfFireLeader extends NPC {
             } 
         } else {
             if (wantsToInteract) {
-                map.getTrainer().addBadge("Fire Badge");
+                //map.getTrainer().addBadge("Fire Badge");
+                map.getTrainer().addBadge();
                 this.wantsToInteract = false;
                 return new InteractionInfo("You are a good trainer, here you get the fire badge.", null, false); 
             } else {
